@@ -1,0 +1,45 @@
+syntax = "proto3";
+option go_package = ".;proto"; // 替换为您的实际包路径
+message MessageRequest{
+    string title = 1;  //标题
+    string body = 2;   //内容
+    string attach = 3;  //附件
+}
+message MessageResponse{
+    uint32 code=1; //状态码 0=失败,1=成功
+    string message=2;//信息
+}
+message MessageListRequest{
+    string title = 1;  //标题
+    int64 start_time=2;
+    int64 end_time=3;
+    int64 page=4;
+    int64 limit=5;
+}
+message MessageList{
+   int64  id=5;
+   string title=1;
+   string body=2;
+   string attach=3;
+   int64 createtime=4;
+}
+message MessageListResponse{
+    uint32 code=1; //状态码 0=失败,1=成功
+    string message=2;//信息
+    repeated MessageList data=3;
+    int64 count=4;
+}
+message FileRequest{
+    bytes data = 1;  //数据
+    string file_name=2;//文件名
+}
+message FileResponse{
+    uint32 code=1; //状态码 0=失败,1=成功
+    string message=2;//信息
+    string data=3;
+}
+service MessageService {
+    rpc SetMessage(MessageRequest) returns (MessageResponse){}
+    rpc UploadFile(FileRequest) returns (FileResponse){}
+    rpc GetMessageList(MessageListRequest) returns (MessageListResponse){}
+}

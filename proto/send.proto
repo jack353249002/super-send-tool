@@ -1,0 +1,112 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+option go_package = ".;proto"; // 替换为您的实际包路径
+message SmtpServer{
+    int64 id=1;
+    string name=2;
+    string host=3;
+    int64 port=4;
+}
+message SmtpServerResponse{
+    repeated SmtpServer data=3;
+    uint32 code=1; //状态码 0=失败,1=成功
+    string message=2;//信息
+    int64 count=4;
+}
+message AddSendRequest{
+    string title = 1;
+    int64 message_id = 2;
+    int64 createtime = 3;
+    uint32 send_model = 4;
+    string send_server_id = 5;
+    uint32 dispatch_model=6;
+    string receive = 7;
+}
+message EditSendRequest{
+    int64 id=8;
+    string title = 1;
+    int64 message_id = 2;
+    int64 createtime = 3;
+    uint32 send_model = 4;
+    string send_server_id = 5;
+    uint32 dispatch_model=6;
+    string receive = 7;
+}
+message SendInfoRequest{
+    int64 send_id = 1;
+}
+message SendInfoActionRequest{
+    int64 send_id = 1;
+    int64 status=2;
+}
+message SendInfoActionResponse{
+    uint32 code=1; //状态码 0=失败,1=成功
+    string message=2;//信息
+}
+message AddSendResponse{
+    uint32 code=1; //状态码 0=失败,1=成功
+    string message=2;//信息
+}
+message SendInfoResponse{
+    uint32 code=1; //状态码 0=失败,1=成功
+    string message=2;//信息
+}
+message GetSendInfoList{
+    int64 id=12;
+    string title = 1;
+    int64 message_id = 2;
+    int64 createtime = 3;
+    uint32 send_model = 4;
+    string send_server_id = 5;
+    uint32 dispatch_model=6;
+    string receive = 7;
+    uint32 status=8;
+    uint32 send_list_count=9;
+    uint32 success_count=10;
+    string message_title=11;//消息标题
+    string send_server_text=13;//消息标题
+}
+message GetSendInfoListResponse{
+    repeated GetSendInfoList data=3;
+    uint32 code=1; //状态码 0=失败,1=成功
+    string message=2;//信息
+    int64 count=4;
+}
+message GetSendInfoListRequest{
+    int64 page=1;
+    int64 limit=2;
+    int64 status=3;
+}
+
+message GetSendList{
+    int64 id=5;
+    int64 send_id = 1;
+    string receive = 2;
+    int64 status = 3;
+    int64 send_server_id = 4;
+    string send_server_text=6;
+}
+
+message GetSendListResponse{
+    repeated GetSendList data=3;
+    uint32 code=1; //状态码 0=失败,1=成功
+    string message=2;//信息
+    int64 count=4;
+}
+
+message GetSendListRequest{
+    int64 page=1;
+    int64 limit=2;
+    int64 status=3;
+    int64 send_id = 4;
+}
+
+service SendService {
+    rpc SetSend(AddSendRequest) returns (AddSendResponse){}
+    rpc SendInfo(SendInfoRequest) returns (SendInfoResponse){}
+    rpc GetSendInfoList(GetSendInfoListRequest) returns (GetSendInfoListResponse){}
+    rpc GetSendList(GetSendListRequest) returns (GetSendListResponse){}
+    rpc SendInfoAction(SendInfoActionRequest) returns (SendInfoActionResponse){}
+    rpc SetSendInfo(EditSendRequest) returns (AddSendResponse){}
+    rpc GetSmtpServerList(google.protobuf.Empty) returns (SmtpServerResponse){}
+}

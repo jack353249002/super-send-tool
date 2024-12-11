@@ -1,0 +1,105 @@
+syntax = "proto3";
+option go_package = ".;proto"; // 替换为您的实际包路径
+message AddReceiveRequest{
+    string title = 1;
+    string receive_rule = 2;
+    string receive_server_id = 3;
+    int64 receive_model = 4;
+    int64 status = 5;
+    int64 end_type = 6;
+    string end_rule = 7;
+}
+message GetReceiveRequest{
+    string title = 1;
+    string receive_rule = 2;
+    string receive_server_id = 3;
+    int64 receive_model = 4;
+    int64 status = 5;
+    int64 end_type = 6;
+    string end_rule = 7;
+}
+message GetReceiveMessageListRequest{
+    int64 receive_id = 1;
+}
+message GetReceiveMessageList{
+    int64  id=1;
+    string subject=2;
+    int64 imap_server_id=3;
+    string  sender_address=4;
+    string date=5;
+    string  message_id=6;
+    string imap_server_text=7;
+    uint32 status=8;
+}
+message GetReceiveMessageListResponse{
+    uint32 code=1; //状态码 0=失败,1=成功
+    string message=2;//信息
+    repeated GetReceiveMessageList data=3;
+    int64 count=4;
+}
+
+message GetReceiveMessageInfoRequest{
+    int64 id=1;
+    string message_id=2;
+    int64 imap_server_id=3;
+}
+message FileInfo{
+    bytes file_bytes=1;
+    string file_name=2;
+}
+message GetReceiveMessageInfo{
+    int64  id=1;
+    string subject=2;
+    int64 imap_server_id=3;
+    string  sender_address=4;
+    string date=5;
+    string  message_id=6;
+    string body=7;
+    repeated FileInfo files=8;
+    string imap_server_text=9;
+    uint32 status=10;
+}
+message GetReceiveMessageInfoResponse{
+    uint32 code=1; //状态码 0=失败,1=成功
+    string message=2;//信息
+    GetReceiveMessageInfo data=3;
+}
+
+message AddReceiveRequestResponse{
+    uint32 code=1; //状态码 0=失败,1=成功
+    string message=2;//信息
+}
+message ReceiveActionRequest{
+    int64 receive_id = 1;
+    int64 status=2;
+}
+message ReceiveActionResponse{
+    uint32 code=1; //状态码 0=失败,1=成功
+    string message=2;//信息
+}
+message ReceiveListRequest{
+    int64 page=1;
+    int64 limit=2;
+    int64 status=3;
+}
+message ReceiveList{
+    int64 id=1;
+    string title=2;
+    int64 createtime=3;
+    string receive_server_id=4;
+    uint64 status=5;
+    string receive_server_text=6;
+}
+message GetReceiveListResponse{
+    uint32 code=1; //状态码 0=失败,1=成功
+    string message=2;//信息
+    repeated ReceiveList data=3;
+    int64 count=4;
+}
+service ReceiveService {
+    rpc AddReceive(AddReceiveRequest) returns (AddReceiveRequestResponse){}
+    rpc GetReceiveMessages(GetReceiveMessageListRequest) returns (GetReceiveMessageListResponse){}
+    rpc GetReceiveMessageInfo(GetReceiveMessageInfoRequest) returns (GetReceiveMessageInfoResponse){}
+    rpc ReceiveAction(ReceiveActionRequest) returns (ReceiveActionResponse){}
+    rpc GetReceiveList(ReceiveListRequest) returns (GetReceiveListResponse){}
+}
