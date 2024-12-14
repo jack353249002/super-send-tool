@@ -15,6 +15,10 @@ message LoginRequest{
     string username=1;
     string password=2;
 }
+message RegisterRequest{
+    string username=1;
+    string password=2;
+}
 
 message ListenReceiveRequest{
     repeated int64 ids=1;
@@ -33,12 +37,21 @@ message MessageSendResponse{
 message LoginResponse{
     string token=1;
 }
+message RegisterResponse{
+    string token=1;
+}
 message LoginPublicResponse{
     uint32 code=1; //状态码 0=失败,1=成功
     LoginResponse login_response =2;
     string message=3;//信息
 }
+message RegisterPublicResponse{
+    uint32 code=1; //状态码 0=失败,1=成功
+    RegisterResponse register_response =2;
+    string message=3;//信息
+}
 service UsersService {
     rpc MessageSend(stream MessageSendRequest) returns (stream MessageSendResponse){}
     rpc Login(LoginRequest) returns (LoginPublicResponse){}
+    rpc Register(RegisterRequest) returns (RegisterPublicResponse){}
 }

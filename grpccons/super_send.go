@@ -6,6 +6,7 @@ import (
 	"super-send-tool/db"
 	"super-send-tool/model/dbmodel"
 	"sync"
+	"time"
 )
 
 var SuperSendGroupAction = new(SuperSendGroup)
@@ -27,8 +28,12 @@ func (s *SuperSendGroup) Get(id int) (superSend *SuperSend) {
 			if superSendInfo.IsSsl == 1 {
 				isSSL = true
 			}
-			superSend.Init(superSendInfo.ID, superSendInfo.Address, superSendInfo.Username, superSendInfo.Password, isSSL)
-			s.SetSuperSend(superSend)
+			err = superSend.Init(superSendInfo.ID, superSendInfo.Address, superSendInfo.Username, superSendInfo.Password, isSSL)
+			if err == nil {
+				s.SetSuperSend(superSend)
+			} else {
+				return nil
+			}
 		}
 	}
 	return
@@ -79,7 +84,8 @@ func (s *SuperSend) Init(id int, address string, userName, password string, isSS
 	s.UserName = userName
 	s.Password = password
 	s.IsSSL = isSSL
-	s.Conn, err = grpc.Dial(address, grpc.WithInsecure(), grpc.WithBlock())
+	ctx, _ := context.WithTimeout(context.Background(), 15*time.Second)
+	s.Conn, err = grpc.DialContext(ctx, address, grpc.WithInsecure(), grpc.WithBlock())
 	return
 }
 func (s *SuperSend) ReConnect() (err error) {

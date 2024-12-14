@@ -14,6 +14,7 @@ type SuperSendConnInfo struct {
 	Username string `json:"username" gorm:"column:username"`
 	Password string `json:"password" gorm:"column:password"`
 	Online   uint8  `json:"online"`
+	Token    string `json:"token"`
 }
 
 func (m *SuperSendConnInfo) TableName() string {

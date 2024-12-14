@@ -40,3 +40,10 @@ func ResponseFailed(c *gin.Context, data interface{}, msg string) {
 	base.Message = msg
 	c.JSON(200, base)
 }
+func ResponseNotAuth(c *gin.Context, data interface{}, msg string) {
+	var base response.Base
+	base.Status = 401
+	base.Result = data
+	base.Message = msg
+	c.JSON(200, base)
+}
