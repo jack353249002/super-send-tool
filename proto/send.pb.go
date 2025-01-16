@@ -645,7 +645,7 @@ type GetSendInfoList struct {
 	SendListCount  uint32 `protobuf:"varint,9,opt,name=send_list_count,json=sendListCount,proto3" json:"send_list_count,omitempty"`
 	SuccessCount   uint32 `protobuf:"varint,10,opt,name=success_count,json=successCount,proto3" json:"success_count,omitempty"`
 	MessageTitle   string `protobuf:"bytes,11,opt,name=message_title,json=messageTitle,proto3" json:"message_title,omitempty"`         //消息标题
-	SendServerText string `protobuf:"bytes,13,opt,name=send_server_text,json=sendServerText,proto3" json:"send_server_text,omitempty"` //消息标题
+	SendServerText string `protobuf:"bytes,13,opt,name=send_server_text,json=sendServerText,proto3" json:"send_server_text,omitempty"` //发送服务标题
 }
 
 func (x *GetSendInfoList) Reset() {

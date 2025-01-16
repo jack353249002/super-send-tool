@@ -11,6 +11,7 @@ func SuperSendRouter(r *gin.Engine) {
 	{
 		v1.Use(middleware.MiddInfo())
 		v1.POST("/getSuperSendList", controller.SuperSendList)
+		v1.POST("/getSuperSendInfo", controller.GetSuperSendInfo)
 		v1.POST("/addSuperSend", controller.AddSuperSend)
 		v1.POST("/updateSuperSend", controller.UpdateSuperSend)
 		v1.POST("/deleteSuperSend", controller.DeleteSuperSend)
@@ -26,5 +27,6 @@ func SuperSendRouter(r *gin.Engine) {
 		v1.POST("/sendInfoAction", controller.SendInfoAction)
 		v1.POST("/setSendInfo", controller.SetSendInfo)
 		v1.POST("/getSmtpServerList", controller.GetSmtpServerList)
+		v1.POST("/upload", controller.Upload)
 	}
 }

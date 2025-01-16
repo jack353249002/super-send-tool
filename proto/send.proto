@@ -64,7 +64,7 @@ message GetSendInfoList{
     uint32 send_list_count=9;
     uint32 success_count=10;
     string message_title=11;//消息标题
-    string send_server_text=13;//消息标题
+    string send_server_text=13;//发送服务标题
 }
 message GetSendInfoListResponse{
     repeated GetSendInfoList data=3;

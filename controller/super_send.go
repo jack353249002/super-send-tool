@@ -47,8 +47,10 @@ func OnlineSuperSend(c *gin.Context) {
 		var res []response.OnlineMenu
 		for _, val := range list {
 			var row response.OnlineMenu
+			row.ID = val.ID
 			row.Title = fmt.Sprintf("id:%d,address:%s,username:%s", val.ID, val.Address, val.Username)
 			row.Name = fmt.Sprintf("%d-%s", val.ID, val.Address)
+			row.Token = val.Token
 			res = append(res, row)
 		}
 		ResponseSuccess(c, res, "success")
@@ -91,6 +93,29 @@ func SuperSendList(c *gin.Context) {
 	} else {
 		totalPage := utils.CreatePage(int(count), pageListRequest.PageSize)
 		ResponseTableSuccess(c, list, pageListRequest.PageSize, pageListRequest.PageNo, totalPage, int(count), "success")
+		return
+	}
+}
+
+// @Summary 获取信息
+// @Router /super_send/getSuperSendInfo [POST]
+func GetSuperSendInfo(c *gin.Context) {
+	dao := dbmodel.NewSuperSendConnInfoDao(c, db.Db)
+	var getSuperSendInfo request.GetSuperSendInfoRequest
+	err := c.ShouldBind(&getSuperSendInfo)
+	if err != nil {
+		// 自定义错误提示
+		errors := validate.SuperSendErrorMessages(err)
+		// 提取验证错误信息
+		ResponseFailed(c, nil, validate.GetAllErrorStr(errors))
+		return
+	}
+	info, err := dao.Get(c, "*", "id=@id", map[string]interface{}{"id": getSuperSendInfo.ID})
+	if err != nil {
+		ResponseFailed(c, nil, err.Error())
+		return
+	} else {
+		ResponseSuccess(c, info, "success")
 		return
 	}
 }

@@ -51,6 +51,10 @@ func SuperSendErrorMessages(err error) map[string]string {
 				if fieldErr.Tag() == "required" {
 					errors["send_id"] = "发送id不能为空"
 				}
+			case "SendServerID":
+				if fieldErr.Tag() == "required" {
+					errors["send_server_id"] = "发送服务器id不能为空"
+				}
 			}
 		}
 	}

@@ -4,6 +4,9 @@ type SuperSendListRequest struct {
 	PageListRequest
 	IsSSL int `json:"is_ssl"`
 }
+type GetSuperSendInfoRequest struct {
+	ID int `json:"id" binding:"required"`
+}
 type AddSuperSendRequest struct {
 	Address  string `json:"address" binding:"required"`
 	IsSSL    uint8  `json:"is_ssl" binding:""`
@@ -31,10 +34,12 @@ type RegisterSuperSendRequest struct {
 	ID    int    `json:"id" binding:"required"`
 	Token string `json:"token" binding:"required"`
 }
-type AddMessageRequest struct {
-	Title  string `json:"title" binding:"required"`
-	Body   string `json:"body" binding:"required"`
-	Attach string `json:"attach"`
+type SetMessageRequest struct {
+	ID          int    `json:"id"`
+	Title       string `json:"title" binding:"required"`
+	Body        string `json:"body" binding:"required"`
+	Attach      string `json:"attach"`
+	ContentType string `json:"content_type"`
 }
 type MessageListRequest struct {
 	PageListRequest
@@ -65,12 +70,12 @@ type SendInfoActionRequest struct {
 	SendID int `json:"send_id"`
 }
 type SetSendInfoRequest struct {
-	ID            int64  `json:"id" binding:"required"`
-	Title         string `json:"title" binding:"required"`
+	ID int64 `json:"id" binding:"required"`
+	/*Title         string `json:"title" binding:"required"`
 	MessageID     int64  `json:"message_id" binding:"required"`
 	CreateTime    int64  `json:"create_time"`
-	SendModel     uint32 `json:"send_model" binding:"required"`
-	SendServerID  string `json:"send_server_id" binding:"required"`
-	DispatchModel uint32 `json:"dispatch_model" binding:"required"`
-	Receive       string `json:"receive" binding:"required"`
+	SendModel     uint32 `json:"send_model" binding:"required"`*/
+	SendServerID string `json:"send_server_id" binding:"required"`
+	/*DispatchModel uint32 `json:"dispatch_model" binding:"required"`
+	Receive       string `json:"receive" binding:"required"`*/
 }

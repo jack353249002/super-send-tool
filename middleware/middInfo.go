@@ -14,6 +14,7 @@ var notAuth = map[string]struct{}{
 	"/super_send/getOnlineSuperSend": {},
 	"/super_send/updateSuperSend":    {},
 	"/super_send/deleteSuperSend":    {},
+	"/super_send/getSuperSendInfo":   {},
 }
 var notSendID = map[string]struct{}{
 	"/super_send/getSuperSendList":   {},
@@ -22,12 +23,13 @@ var notSendID = map[string]struct{}{
 	"/super_send/getOnlineSuperSend": {},
 	"/super_send/updateSuperSend":    {},
 	"/super_send/deleteSuperSend":    {},
+	"/super_send/getSuperSendInfo":   {},
 }
 
 func MiddInfo() gin.HandlerFunc {
 	return func(c *gin.Context) {
-		tokenString := c.GetHeader("token")
-		superSendID := c.GetHeader("super_send_id")
+		tokenString := c.GetHeader("Token")
+		superSendID := c.GetHeader("Super_send_id")
 		_, have := notSendID[c.Request.URL.Path]
 		if superSendID == "" && !have {
 			controller.ResponseFailed(c, nil, "super_send_id is required")

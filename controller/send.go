@@ -196,7 +196,7 @@ func SetSendInfo(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	ctx = metadata.NewOutgoingContext(ctx, md)
-	res, err := client.SetSendInfo(ctx, &proto.EditSendRequest{Id: setSendInfoRequest.ID, Title: setSendInfoRequest.Title, Receive: setSendInfoRequest.Receive, MessageId: setSendInfoRequest.MessageID})
+	res, err := client.SetSendInfo(ctx, &proto.EditSendRequest{Id: setSendInfoRequest.ID, SendServerId: setSendInfoRequest.SendServerID})
 	if err != nil {
 		ResponseFailed(c, nil, err.Error())
 		return
