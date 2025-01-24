@@ -28,5 +28,10 @@ func SuperSendRouter(r *gin.Engine) {
 		v1.POST("/setSendInfo", controller.SetSendInfo)
 		v1.POST("/getSmtpServerList", controller.GetSmtpServerList)
 		v1.POST("/upload", controller.Upload)
+
+		v1.POST("/getSmtpServer", controller.GetSmtpServer)
+		v1.POST("/setSmtpServer", controller.SetSmtpServer)
+		v1.POST("/delSmtpServer", controller.DelSmtpServer)
+		v1.POST("/reloadServer", controller.ReloadServer)
 	}
 }
