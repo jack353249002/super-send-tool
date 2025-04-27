@@ -24,6 +24,7 @@ const (
 	ReceiveService_GetReceiveMessageInfo_FullMethodName = "/ReceiveService/GetReceiveMessageInfo"
 	ReceiveService_ReceiveAction_FullMethodName         = "/ReceiveService/ReceiveAction"
 	ReceiveService_GetReceiveList_FullMethodName        = "/ReceiveService/GetReceiveList"
+	ReceiveService_SetReceive_FullMethodName            = "/ReceiveService/SetReceive"
 )
 
 // ReceiveServiceClient is the client API for ReceiveService service.
@@ -35,6 +36,7 @@ type ReceiveServiceClient interface {
 	GetReceiveMessageInfo(ctx context.Context, in *GetReceiveMessageInfoRequest, opts ...grpc.CallOption) (*GetReceiveMessageInfoResponse, error)
 	ReceiveAction(ctx context.Context, in *ReceiveActionRequest, opts ...grpc.CallOption) (*ReceiveActionResponse, error)
 	GetReceiveList(ctx context.Context, in *ReceiveListRequest, opts ...grpc.CallOption) (*GetReceiveListResponse, error)
+	SetReceive(ctx context.Context, in *AddReceiveRequest, opts ...grpc.CallOption) (*AddReceiveRequestResponse, error)
 }
 
 type receiveServiceClient struct {
@@ -90,6 +92,15 @@ func (c *receiveServiceClient) GetReceiveList(ctx context.Context, in *ReceiveLi
 	return out, nil
 }
 
+func (c *receiveServiceClient) SetReceive(ctx context.Context, in *AddReceiveRequest, opts ...grpc.CallOption) (*AddReceiveRequestResponse, error) {
+	out := new(AddReceiveRequestResponse)
+	err := c.cc.Invoke(ctx, ReceiveService_SetReceive_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // ReceiveServiceServer is the server API for ReceiveService service.
 // All implementations must embed UnimplementedReceiveServiceServer
 // for forward compatibility
@@ -99,6 +110,7 @@ type ReceiveServiceServer interface {
 	GetReceiveMessageInfo(context.Context, *GetReceiveMessageInfoRequest) (*GetReceiveMessageInfoResponse, error)
 	ReceiveAction(context.Context, *ReceiveActionRequest) (*ReceiveActionResponse, error)
 	GetReceiveList(context.Context, *ReceiveListRequest) (*GetReceiveListResponse, error)
+	SetReceive(context.Context, *AddReceiveRequest) (*AddReceiveRequestResponse, error)
 	mustEmbedUnimplementedReceiveServiceServer()
 }
 
@@ -120,6 +132,9 @@ func (UnimplementedReceiveServiceServer) ReceiveAction(context.Context, *Receive
 }
 func (UnimplementedReceiveServiceServer) GetReceiveList(context.Context, *ReceiveListRequest) (*GetReceiveListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetReceiveList not implemented")
+}
+func (UnimplementedReceiveServiceServer) SetReceive(context.Context, *AddReceiveRequest) (*AddReceiveRequestResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method SetReceive not implemented")
 }
 func (UnimplementedReceiveServiceServer) mustEmbedUnimplementedReceiveServiceServer() {}
 
@@ -224,6 +239,24 @@ func _ReceiveService_GetReceiveList_Handler(srv interface{}, ctx context.Context
 	return interceptor(ctx, in, info, handler)
 }
 
+func _ReceiveService_SetReceive_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(AddReceiveRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ReceiveServiceServer).SetReceive(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: ReceiveService_SetReceive_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ReceiveServiceServer).SetReceive(ctx, req.(*AddReceiveRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // ReceiveService_ServiceDesc is the grpc.ServiceDesc for ReceiveService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -250,6 +283,10 @@ var ReceiveService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetReceiveList",
 			Handler:    _ReceiveService_GetReceiveList_Handler,
+		},
+		{
+			MethodName: "SetReceive",
+			Handler:    _ReceiveService_SetReceive_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

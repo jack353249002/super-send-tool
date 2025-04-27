@@ -1,0 +1,36 @@
+syntax = "proto3";
+import "google/protobuf/empty.proto";
+option go_package = ".;proto"; // 替换为您的实际包路径
+message Conf{
+  int64 id =1;
+  string key=2;
+  string val=3;
+}
+message GetConfListRequest{
+  string keywords = 1;  //关键字
+}
+message ConfListResponse{
+  repeated Conf data=3;
+  uint32 code=1; //状态码 0=失败,1=成功
+  string message=2;//信息
+  int64 count=4;
+}
+message SetConfRequest{
+  int64 id=1;
+  string key=2;
+  string val=3;
+}
+message DelConfRequest{
+  int64 id=1;
+}
+message ConfResponse{
+  uint32 code=1; //状态码 0=失败,1=成功
+  string message=2;//信息
+}
+
+service ConfService {
+  rpc SetConf(SetConfRequest) returns (ConfResponse){}
+  rpc DelConf(DelConfRequest) returns (ConfResponse){}
+  rpc GetConfList(GetConfListRequest) returns (ConfListResponse){}
+  rpc Reload(google.protobuf.Empty) returns (ConfResponse){}
+}

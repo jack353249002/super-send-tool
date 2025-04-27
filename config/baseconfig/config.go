@@ -5,6 +5,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 	"time"
 )
 
@@ -35,6 +36,10 @@ func init() {
 	CONFIG.ServerPrivateKey = viper.GetString("SERVER_SERVERPRIVATEKEY")
 	CONFIG.DBPath = viper.GetString("DB_PATH")
 	CONFIG.PageSize = viper.GetInt("PAGESIZE")
+	caPaths := viper.GetString("CA_PATHS")
+	if caPaths != "" {
+		CONFIG.CAPATHS = strings.Split(caPaths, ",")
+	}
 
 }
 
@@ -57,4 +62,5 @@ type Config struct {
 	PeerClientAuth       bool
 	PeerClientPublicKey  string
 	PeerClientPrivateKey string
+	CAPATHS              []string
 }

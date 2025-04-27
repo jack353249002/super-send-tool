@@ -2,7 +2,12 @@ package grpccons
 
 import (
 	"context"
+	"crypto/tls"
+	"crypto/x509"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials"
+	"io/ioutil"
+	"super-send-tool/config/baseconfig"
 	"super-send-tool/db"
 	"super-send-tool/model/dbmodel"
 	"sync"
@@ -84,8 +89,30 @@ func (s *SuperSend) Init(id int, address string, userName, password string, isSS
 	s.UserName = userName
 	s.Password = password
 	s.IsSSL = isSSL
-	ctx, _ := context.WithTimeout(context.Background(), 15*time.Second)
-	s.Conn, err = grpc.DialContext(ctx, address, grpc.WithInsecure(), grpc.WithBlock())
+	var opts []grpc.DialOption
+	ctx, _ := context.WithTimeout(context.Background(), 35*time.Second)
+	if s.IsSSL {
+		caCertPool := x509.NewCertPool()
+		for _, val := range baseconfig.CONFIG.CAPATHS {
+			// 加载CA证书
+			caCert, err := ioutil.ReadFile(val)
+			if err != nil {
+				continue
+			}
+			caCertPool.AppendCertsFromPEM(caCert)
+		}
+		// 创建TLS配置
+		tlsConfig := &tls.Config{
+			RootCAs: caCertPool,
+		}
+		// 创建gRPC凭证
+		creds := credentials.NewTLS(tlsConfig)
+		opts = append(opts, grpc.WithTransportCredentials(creds))
+	} else {
+		opts = append(opts, grpc.WithInsecure())
+	}
+	opts = append(opts, grpc.WithBlock())
+	s.Conn, err = grpc.DialContext(ctx, address, opts...)
 	return
 }
 func (s *SuperSend) ReConnect() (err error) {

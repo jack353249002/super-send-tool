@@ -1,0 +1,64 @@
+syntax = "proto3";
+option go_package = ".;proto"; // 替换为您的实际包路径
+
+message AddRoleForUserRequest{
+  string role=1;
+  string  username=2;
+}
+message DelRoleForUserRequest{
+  string role=1;
+  string  username=2;
+}
+message Roles{
+  string role=1;
+  string  path=2;
+  repeated string action=3;
+}
+message RolesRequest{
+  string role=1;
+  string  path=2;
+  repeated string action=3;
+}
+
+message RolesLisRequest {
+  string search_key = 1;
+  int64 page = 2;
+  int64 page_size = 3;
+}
+message RolesResponse {
+  uint32 code=1; //状态码 0=失败,1=成功
+  string message=2;//信息
+}
+message RolesListResponse {
+  uint32 code=1; //状态码 0=失败,1=成功
+  string message=2;//信息
+  repeated Roles data = 3;
+  int64 total = 4;
+}
+message RolesPermissions{
+  string role=1;
+  string  path=2;
+  string action=3;
+}
+message RolesPermissionsDelRequest{
+  repeated RolesPermissions roles=1;
+}
+message RoleDelRequest{
+  repeated RolesPermissions roles=1;
+}
+message RolesPermissionsListResponse {
+  repeated RolesPermissions data = 1;
+  int64 total = 2;
+  uint32 code=3; //状态码 0=失败,1=成功
+  string message=4;//信息
+}
+
+service RolesService {
+  rpc  Add(RolesRequest) returns (RolesResponse){}  //添加
+  rpc  GetList(RolesLisRequest) returns (RolesListResponse){}   //获取列表
+  rpc  GetRolesPermissions(RolesRequest) returns (RolesPermissionsListResponse){}  //获取权限
+  rpc  DelRolesPermissions(RolesPermissionsDelRequest) returns (RolesResponse){} //删除权限
+  rpc  DelRole(RoleDelRequest) returns (RolesResponse){}
+  rpc  DelUserRole(DelRoleForUserRequest) returns (RolesResponse){}
+  rpc  AddRoleForUser(AddRoleForUserRequest) returns (RolesResponse){} //为用户添加角色
+}

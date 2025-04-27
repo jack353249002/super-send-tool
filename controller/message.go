@@ -105,6 +105,45 @@ func SetMessage(c *gin.Context) {
 	return
 }
 
+// @Summary 删除消息
+// @Router /super_send/delMessage [POST]
+func DelMessage(c *gin.Context) {
+	var delMessageRequest request.DelMessageRequest
+	err := c.ShouldBind(&delMessageRequest)
+	if err != nil {
+		// 提取验证错误信息
+		errors := validate.SuperSendErrorMessages(err)
+		ResponseFailed(c, nil, validate.GetAllErrorStr(errors))
+		return
+	}
+	con := grpccons.SuperSendGroupAction.Get(c.GetInt("super_send_id"))
+	if con == nil {
+		ResponseFailed(c, nil, "连接失败")
+		return
+	}
+	client := proto.NewMessageServiceClient(con.Conn)
+	// 创建元数据
+	md := metadata.Pairs(
+		"token", c.GetString("token"),
+	)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	ctx = metadata.NewOutgoingContext(ctx, md)
+	res, err := client.DelMessage(ctx, &proto.MessageRequest{Id: int64(delMessageRequest.ID)})
+	if err != nil {
+		ResponseFailed(c, nil, err.Error())
+		return
+	} else {
+		if res.Code == 1 {
+			ResponseSuccess(c, nil, res.Message)
+		} else {
+			ResponseFailed(c, nil, res.Message)
+		}
+		return
+	}
+	return
+}
+
 // @Summary 获取列表
 // @Router /super_send/getMessageList [POST]
 func GetMessageList(c *gin.Context) {

@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/metadata"
 	"super-send-tool/db"
 	"super-send-tool/grpccons"
@@ -31,9 +32,54 @@ func SetSuperSendOnline(c *gin.Context) {
 	saveData := map[string]interface{}{"online": setSuperSendOnlineRequest.Online}
 	err = dao.Update(c, "id=@id", saveData, map[string]interface{}{"id": setSuperSendOnlineRequest.ID})
 	if err != nil {
+		if setSuperSendOnlineRequest.Online == 0 {
+			con := grpccons.SuperSendGroupAction.Get(c.GetInt("super_send_id"))
+			if con == nil {
+				ResponseFailed(c, nil, "连接失败")
+				return
+			}
+			client := proto.NewUsersServiceClient(con.Conn)
+			// 创建元数据
+			md := metadata.Pairs(
+				"token", c.GetString("token"),
+			)
+			ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+			defer cancel()
+			ctx = metadata.NewOutgoingContext(ctx, md)
+			client.LogOut(ctx, &empty.Empty{})
+		}
 		ResponseFailed(c, nil, err.Error())
 		return
 	}
+	ResponseSuccess(c, nil, "success")
+	return
+}
+
+// @Summary 断开所有设备
+// @Router /super_send/logoutUserAllDevice [POST]
+func LogoutUserAllDevice(c *gin.Context) {
+	var logOutSendOnlineRequest request.LogOutUserAllDeviceRequest
+	err := c.ShouldBind(&logOutSendOnlineRequest)
+	if err != nil {
+		// 提取验证错误信息
+		errors := validate.SuperSendErrorMessages(err)
+		ResponseFailed(c, nil, validate.GetAllErrorStr(errors))
+		return
+	}
+	con := grpccons.SuperSendGroupAction.Get(c.GetInt("super_send_id"))
+	if con == nil {
+		ResponseFailed(c, nil, "连接失败")
+		return
+	}
+	client := proto.NewUsersServiceClient(con.Conn)
+	// 创建元数据
+	md := metadata.Pairs(
+		"token", c.GetString("token"),
+	)
+	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	defer cancel()
+	ctx = metadata.NewOutgoingContext(ctx, md)
+	client.LogOutAll(ctx, &empty.Empty{})
 	ResponseSuccess(c, nil, "success")
 	return
 }
@@ -74,7 +120,7 @@ func SuperSendList(c *gin.Context) {
 		ResponseFailed(c, nil, validate.GetAllErrorStr(errors))
 		return
 	}
-	offset := utils.CreatePageOffset(pageListRequest.PageNo, pageListRequest.PageSize)
+	offset := utils.CreatePageOffset(int(pageListRequest.PageNo), int(pageListRequest.PageSize))
 	where := "1=@val"
 	params := map[string]interface{}{"val": 1}
 	if pageListRequest.KeyWords != "" {
@@ -85,14 +131,14 @@ func SuperSendList(c *gin.Context) {
 		where += " AND is_ssl=@is_ssl "
 		params["is_ssl"] = pageListRequest.IsSSL
 	}
-	list, err := dao.List(c, "*", where, offset, pageListRequest.PageSize, params)
+	list, err := dao.List(c, "*", where, offset, int(pageListRequest.PageSize), params)
 	count, err := dao.Count(c, "id", where, params)
 	if err != nil {
 		ResponseFailed(c, nil, err.Error())
 		return
 	} else {
-		totalPage := utils.CreatePage(int(count), pageListRequest.PageSize)
-		ResponseTableSuccess(c, list, pageListRequest.PageSize, pageListRequest.PageNo, totalPage, int(count), "success")
+		totalPage := utils.CreatePage(int(count), int(pageListRequest.PageSize))
+		ResponseTableSuccess(c, list, int(pageListRequest.PageSize), int(pageListRequest.PageNo), totalPage, int(count), "success")
 		return
 	}
 }

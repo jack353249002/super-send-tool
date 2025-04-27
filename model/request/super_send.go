@@ -24,6 +24,9 @@ type SetSuperSendOnlineRequest struct {
 	ID     int   `json:"id" binding:"required"`
 	Online uint8 `json:"online"`
 }
+type LogOutUserAllDeviceRequest struct {
+	ID int `json:"id" binding:"required"`
+}
 type DeleteSuperSendRequest struct {
 	ID int `json:"id" binding:"required"`
 }
@@ -40,6 +43,9 @@ type SetMessageRequest struct {
 	Body        string `json:"body" binding:"required"`
 	Attach      string `json:"attach"`
 	ContentType string `json:"content_type"`
+}
+type DelMessageRequest struct {
+	ID int `json:"id"`
 }
 type MessageListRequest struct {
 	PageListRequest

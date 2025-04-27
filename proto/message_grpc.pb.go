@@ -20,6 +20,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	MessageService_SetMessage_FullMethodName     = "/MessageService/SetMessage"
+	MessageService_DelMessage_FullMethodName     = "/MessageService/DelMessage"
 	MessageService_UploadFile_FullMethodName     = "/MessageService/UploadFile"
 	MessageService_GetMessageList_FullMethodName = "/MessageService/GetMessageList"
 )
@@ -29,6 +30,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MessageServiceClient interface {
 	SetMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	DelMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*MessageResponse, error)
 	UploadFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*FileResponse, error)
 	GetMessageList(ctx context.Context, in *MessageListRequest, opts ...grpc.CallOption) (*MessageListResponse, error)
 }
@@ -44,6 +46,15 @@ func NewMessageServiceClient(cc grpc.ClientConnInterface) MessageServiceClient {
 func (c *messageServiceClient) SetMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
 	out := new(MessageResponse)
 	err := c.cc.Invoke(ctx, MessageService_SetMessage_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *messageServiceClient) DelMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*MessageResponse, error) {
+	out := new(MessageResponse)
+	err := c.cc.Invoke(ctx, MessageService_DelMessage_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -73,6 +84,7 @@ func (c *messageServiceClient) GetMessageList(ctx context.Context, in *MessageLi
 // for forward compatibility
 type MessageServiceServer interface {
 	SetMessage(context.Context, *MessageRequest) (*MessageResponse, error)
+	DelMessage(context.Context, *MessageRequest) (*MessageResponse, error)
 	UploadFile(context.Context, *FileRequest) (*FileResponse, error)
 	GetMessageList(context.Context, *MessageListRequest) (*MessageListResponse, error)
 	mustEmbedUnimplementedMessageServiceServer()
@@ -84,6 +96,9 @@ type UnimplementedMessageServiceServer struct {
 
 func (UnimplementedMessageServiceServer) SetMessage(context.Context, *MessageRequest) (*MessageResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetMessage not implemented")
+}
+func (UnimplementedMessageServiceServer) DelMessage(context.Context, *MessageRequest) (*MessageResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DelMessage not implemented")
 }
 func (UnimplementedMessageServiceServer) UploadFile(context.Context, *FileRequest) (*FileResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UploadFile not implemented")
@@ -118,6 +133,24 @@ func _MessageService_SetMessage_Handler(srv interface{}, ctx context.Context, de
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(MessageServiceServer).SetMessage(ctx, req.(*MessageRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _MessageService_DelMessage_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(MessageRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(MessageServiceServer).DelMessage(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: MessageService_DelMessage_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(MessageServiceServer).DelMessage(ctx, req.(*MessageRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -168,6 +201,10 @@ var MessageService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetMessage",
 			Handler:    _MessageService_SetMessage_Handler,
+		},
+		{
+			MethodName: "DelMessage",
+			Handler:    _MessageService_DelMessage_Handler,
 		},
 		{
 			MethodName: "UploadFile",

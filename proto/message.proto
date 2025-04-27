@@ -43,6 +43,7 @@ message FileResponse{
 }
 service MessageService {
     rpc SetMessage(MessageRequest) returns (MessageResponse){}
+    rpc DelMessage(MessageRequest) returns (MessageResponse){}
     rpc UploadFile(FileRequest) returns (FileResponse){}
     rpc GetMessageList(MessageListRequest) returns (MessageListResponse){}
 }
