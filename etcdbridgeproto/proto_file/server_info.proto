@@ -1,0 +1,43 @@
+syntax = "proto3";
+package etcd_bridge;
+option go_package = ".;etcdbridgeproto"; // 替换为您的实际包路径
+
+
+message ServerInfo{
+  int32 is_ssl=1;
+  string ca_cer_path=2;
+  string cert_path=3;
+  string key_path=4;
+  string host=5;
+  int64 type=6;
+  string username=7;
+  string password=8;
+  int64 id=9;
+}
+message SaveServerInfoRequest{
+  int32 is_ssl=1;
+  string ca_cer_path=2;
+  string cert_path=3;
+  string key_path=4;
+  string host=5;
+  int64 type=6;
+  string username=7;
+  string password=8;
+  int64 id=9;
+}
+message DelSaveServerInfoRequest{
+  int64 id=1;
+}
+message GetServerInfoRequest {
+  int64 id = 1;
+}
+message ServerInfoLisRequest {
+  string search_key = 1;
+  int64 page = 2;
+  int64 page_size = 3;
+}
+
+message ServerInfoListResponse {
+  repeated ServerInfo data = 1;
+  int64 total = 2;
+}

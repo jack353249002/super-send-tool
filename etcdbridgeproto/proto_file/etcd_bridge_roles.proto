@@ -1,0 +1,41 @@
+syntax = "proto3";
+package etcd_bridge;
+option go_package = ".;etcdbridgeproto"; // 替换为您的实际包路径
+
+message AddRoleForUserRequest{
+  string role=1;
+  string  username=2;
+}
+message Roles{
+  string role=1;
+  string  path=2;
+  repeated string action=3;
+}
+message RolesRequest{
+  string role=1;
+  string  path=2;
+  repeated string action=3;
+}
+
+message RolesLisRequest {
+  string search_key = 1;
+  int64 page = 2;
+  int64 page_size = 3;
+}
+
+message RolesListResponse {
+  repeated Roles data = 1;
+  int64 total = 2;
+}
+message RolesPermissions{
+  string role=1;
+  string  path=2;
+  string action=3;
+}
+message RolesPermissionsDelRequest{
+  repeated RolesPermissions roles=1;
+}
+message RolesPermissionsListResponse {
+  repeated RolesPermissions data = 1;
+  int64 total = 2;
+}

@@ -1,0 +1,22 @@
+syntax = "proto3";
+package etcd_bridge;
+option go_package = ".;etcdbridgeproto"; // 替换为您的实际包路径
+import "server_info.proto";
+import "sync_conf.proto";
+import "etcd_bridge_users.proto";
+import "etcd_bridge_roles.proto";
+message BaseResponse{
+  int32 code = 1;
+  string msg = 2;
+  oneof payload {
+     ServerInfoListResponse server_info_list = 3;
+    SyncConfListResponse sync_conf_list = 4;
+    ServerInfo server_info = 5;
+    Users      users_info=6;
+    UsersListResponse users_list = 7;
+    SyncConf sync_conf_info = 8;
+    RolesListResponse roles_list=9;
+    RolesPermissionsListResponse roles_permissions_list=10;
+    LoginResponse login_info=11;
+  }
+}

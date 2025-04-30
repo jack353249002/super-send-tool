@@ -9,6 +9,12 @@ import (
 func SuperSendRouter(r *gin.Engine) {
 	// 静态文件服务
 	r.Static("/", "run_root")
+	etcdBridge := r.Group("/etcd_bridge")
+	{
+		etcdBridge.Use(middleware.EtcdBridgeMiddInfo())
+		etcdBridge.POST("/addEtcdBridge", controller.AddEtcdBridge)
+		etcdBridge.POST("/loginEtcdBridge", controller.LoginEtcdBridge)
+	}
 	v1 := r.Group("/super_send")
 	{
 		v1.Use(middleware.MiddInfo())

@@ -1,0 +1,37 @@
+syntax = "proto3";
+package etcd_bridge;
+option go_package = ".;etcdbridgeproto"; // 替换为您的实际包路径
+message LoginRequest{
+  string username=1;
+  string password =2;
+}
+message LoginResponse{
+  string token=1;
+}
+
+message Users{
+  int64 id=1;
+  string username=2;
+  string password =3;
+  int32 status=4;
+  repeated string roles=5;
+}
+message UsersRequest{
+  int64 id=1;
+  string username=2;
+  string password =3;
+  int32 status=4;
+  repeated string roles=5;
+}
+message UsersLisRequest {
+  string search_key = 1;
+  int64 page = 2;
+  int64 page_size = 3;
+}
+message DelUsersRequest {
+  int64 id=1;
+}
+message UsersListResponse {
+  repeated Users data = 1;
+  int64 total = 2;
+}

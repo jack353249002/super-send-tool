@@ -1,4 +1,5 @@
 syntax = "proto3";
+package super_send;
 option go_package = ".;proto"; // 替换为您的实际包路径
 
 message AddRoleForUserRequest{

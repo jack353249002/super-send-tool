@@ -1,0 +1,38 @@
+syntax = "proto3";
+package etcd_bridge;
+option go_package = ".;etcdbridgeproto"; // 替换为您的实际包路径
+import "server_info.proto";
+import "sync_conf.proto";
+import "base.proto";
+import "etcd_bridge_users.proto";
+import "etcd_bridge_roles.proto";
+service ServerInfoService {
+  rpc  Add(SaveServerInfoRequest) returns (BaseResponse){}   //添加服务器
+  rpc  Update(SaveServerInfoRequest) returns (BaseResponse){}  //编辑服务器
+  rpc Del(DelSaveServerInfoRequest) returns (BaseResponse){}   //删除
+  rpc Get(GetServerInfoRequest) returns (BaseResponse){}      //获取
+  rpc GetList(ServerInfoLisRequest) returns (BaseResponse){}  //获取列表
+}
+service SyncConfService {
+  rpc  Add(SaveSyncConfRequest) returns (BaseResponse){}   //添加
+  rpc  Update(SaveSyncConfRequest) returns (BaseResponse){}  //编辑
+  rpc Del(DelSyncConfRequest) returns (BaseResponse){}       //删除
+  rpc Get(GetSyncConfRequest) returns (BaseResponse){}       //获取
+  rpc GetList(SyncConfListRequest) returns (BaseResponse){}  //获取列表
+  rpc Action(SyncConfActionRequest) returns (BaseResponse){}  //操作
+}
+service UsersService {
+  rpc  Add(UsersRequest) returns (BaseResponse){}     //添加
+  rpc  Update(UsersRequest) returns (BaseResponse){}   //编辑
+  rpc Del(DelUsersRequest) returns (BaseResponse){}    //删除
+  rpc Get(UsersRequest) returns (BaseResponse){}       //获取
+  rpc GetList(UsersLisRequest) returns (BaseResponse){}  //获取列表
+  rpc  Login(LoginRequest) returns (BaseResponse){} //登录
+}
+service RolesService {
+  rpc  Add(RolesRequest) returns (BaseResponse){}  //添加
+  rpc  GetList(RolesLisRequest) returns (BaseResponse){}   //获取列表
+  rpc  GetRolesPermissions(RolesRequest) returns (BaseResponse){}  //获取权限
+  rpc  DelRolesPermissions(RolesPermissionsDelRequest) returns (BaseResponse){} //删除权限
+  rpc  AddRoleForUser(AddRoleForUserRequest) returns (BaseResponse){} //为用户添加角色
+}
