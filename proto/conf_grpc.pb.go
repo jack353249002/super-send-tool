@@ -20,10 +20,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ConfService_SetConf_FullMethodName     = "/ConfService/SetConf"
-	ConfService_DelConf_FullMethodName     = "/ConfService/DelConf"
-	ConfService_GetConfList_FullMethodName = "/ConfService/GetConfList"
-	ConfService_Reload_FullMethodName      = "/ConfService/Reload"
+	ConfService_SetConf_FullMethodName     = "/super_send.ConfService/SetConf"
+	ConfService_DelConf_FullMethodName     = "/super_send.ConfService/DelConf"
+	ConfService_GetConfList_FullMethodName = "/super_send.ConfService/GetConfList"
+	ConfService_Reload_FullMethodName      = "/super_send.ConfService/Reload"
 )
 
 // ConfServiceClient is the client API for ConfService service.
@@ -196,7 +196,7 @@ func _ConfService_Reload_Handler(srv interface{}, ctx context.Context, dec func(
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ConfService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ConfService",
+	ServiceName: "super_send.ConfService",
 	HandlerType: (*ConfServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

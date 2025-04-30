@@ -20,11 +20,11 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ImapService_SetImap_FullMethodName        = "/ImapService/SetImap"
-	ImapService_DelImap_FullMethodName        = "/ImapService/DelImap"
-	ImapService_GetImapList_FullMethodName    = "/ImapService/GetImapList"
-	ImapService_Reload_FullMethodName         = "/ImapService/Reload"
-	ImapService_GetImapAllList_FullMethodName = "/ImapService/GetImapAllList"
+	ImapService_SetImap_FullMethodName        = "/super_send.ImapService/SetImap"
+	ImapService_DelImap_FullMethodName        = "/super_send.ImapService/DelImap"
+	ImapService_GetImapList_FullMethodName    = "/super_send.ImapService/GetImapList"
+	ImapService_Reload_FullMethodName         = "/super_send.ImapService/Reload"
+	ImapService_GetImapAllList_FullMethodName = "/super_send.ImapService/GetImapAllList"
 )
 
 // ImapServiceClient is the client API for ImapService service.
@@ -229,7 +229,7 @@ func _ImapService_GetImapAllList_Handler(srv interface{}, ctx context.Context, d
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ImapService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ImapService",
+	ServiceName: "super_send.ImapService",
 	HandlerType: (*ImapServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

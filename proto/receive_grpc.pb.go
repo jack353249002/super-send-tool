@@ -19,12 +19,12 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	ReceiveService_AddReceive_FullMethodName            = "/ReceiveService/AddReceive"
-	ReceiveService_GetReceiveMessages_FullMethodName    = "/ReceiveService/GetReceiveMessages"
-	ReceiveService_GetReceiveMessageInfo_FullMethodName = "/ReceiveService/GetReceiveMessageInfo"
-	ReceiveService_ReceiveAction_FullMethodName         = "/ReceiveService/ReceiveAction"
-	ReceiveService_GetReceiveList_FullMethodName        = "/ReceiveService/GetReceiveList"
-	ReceiveService_SetReceive_FullMethodName            = "/ReceiveService/SetReceive"
+	ReceiveService_AddReceive_FullMethodName            = "/super_send.ReceiveService/AddReceive"
+	ReceiveService_GetReceiveMessages_FullMethodName    = "/super_send.ReceiveService/GetReceiveMessages"
+	ReceiveService_GetReceiveMessageInfo_FullMethodName = "/super_send.ReceiveService/GetReceiveMessageInfo"
+	ReceiveService_ReceiveAction_FullMethodName         = "/super_send.ReceiveService/ReceiveAction"
+	ReceiveService_GetReceiveList_FullMethodName        = "/super_send.ReceiveService/GetReceiveList"
+	ReceiveService_SetReceive_FullMethodName            = "/super_send.ReceiveService/SetReceive"
 )
 
 // ReceiveServiceClient is the client API for ReceiveService service.
@@ -261,7 +261,7 @@ func _ReceiveService_SetReceive_Handler(srv interface{}, ctx context.Context, de
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ReceiveService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ReceiveService",
+	ServiceName: "super_send.ReceiveService",
 	HandlerType: (*ReceiveServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

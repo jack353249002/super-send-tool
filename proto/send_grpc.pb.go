@@ -20,13 +20,13 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	SendService_SetSend_FullMethodName           = "/SendService/SetSend"
-	SendService_SendInfo_FullMethodName          = "/SendService/SendInfo"
-	SendService_GetSendInfoList_FullMethodName   = "/SendService/GetSendInfoList"
-	SendService_GetSendList_FullMethodName       = "/SendService/GetSendList"
-	SendService_SendInfoAction_FullMethodName    = "/SendService/SendInfoAction"
-	SendService_SetSendInfo_FullMethodName       = "/SendService/SetSendInfo"
-	SendService_GetSmtpServerList_FullMethodName = "/SendService/GetSmtpServerList"
+	SendService_SetSend_FullMethodName           = "/super_send.SendService/SetSend"
+	SendService_SendInfo_FullMethodName          = "/super_send.SendService/SendInfo"
+	SendService_GetSendInfoList_FullMethodName   = "/super_send.SendService/GetSendInfoList"
+	SendService_GetSendList_FullMethodName       = "/super_send.SendService/GetSendList"
+	SendService_SendInfoAction_FullMethodName    = "/super_send.SendService/SendInfoAction"
+	SendService_SetSendInfo_FullMethodName       = "/super_send.SendService/SetSendInfo"
+	SendService_GetSmtpServerList_FullMethodName = "/super_send.SendService/GetSmtpServerList"
 )
 
 // SendServiceClient is the client API for SendService service.
@@ -295,7 +295,7 @@ func _SendService_GetSmtpServerList_Handler(srv interface{}, ctx context.Context
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var SendService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "SendService",
+	ServiceName: "super_send.SendService",
 	HandlerType: (*SendServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

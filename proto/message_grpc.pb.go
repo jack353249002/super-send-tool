@@ -19,10 +19,10 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	MessageService_SetMessage_FullMethodName     = "/MessageService/SetMessage"
-	MessageService_DelMessage_FullMethodName     = "/MessageService/DelMessage"
-	MessageService_UploadFile_FullMethodName     = "/MessageService/UploadFile"
-	MessageService_GetMessageList_FullMethodName = "/MessageService/GetMessageList"
+	MessageService_SetMessage_FullMethodName     = "/super_send.MessageService/SetMessage"
+	MessageService_DelMessage_FullMethodName     = "/super_send.MessageService/DelMessage"
+	MessageService_UploadFile_FullMethodName     = "/super_send.MessageService/UploadFile"
+	MessageService_GetMessageList_FullMethodName = "/super_send.MessageService/GetMessageList"
 )
 
 // MessageServiceClient is the client API for MessageService service.
@@ -195,7 +195,7 @@ func _MessageService_GetMessageList_Handler(srv interface{}, ctx context.Context
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var MessageService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "MessageService",
+	ServiceName: "super_send.MessageService",
 	HandlerType: (*MessageServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

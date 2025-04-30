@@ -20,16 +20,16 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	UsersService_MessageSend_FullMethodName     = "/UsersService/MessageSend"
-	UsersService_Login_FullMethodName           = "/UsersService/Login"
-	UsersService_Register_FullMethodName        = "/UsersService/Register"
-	UsersService_DelUser_FullMethodName         = "/UsersService/DelUser"
-	UsersService_GetUsers_FullMethodName        = "/UsersService/GetUsers"
-	UsersService_LogOut_FullMethodName          = "/UsersService/LogOut"
-	UsersService_LogOutAll_FullMethodName       = "/UsersService/LogOutAll"
-	UsersService_SetPassword_FullMethodName     = "/UsersService/SetPassword"
-	UsersService_SetUserPassword_FullMethodName = "/UsersService/SetUserPassword"
-	UsersService_GetUserInfo_FullMethodName     = "/UsersService/GetUserInfo"
+	UsersService_MessageSend_FullMethodName     = "/super_send.UsersService/MessageSend"
+	UsersService_Login_FullMethodName           = "/super_send.UsersService/Login"
+	UsersService_Register_FullMethodName        = "/super_send.UsersService/Register"
+	UsersService_DelUser_FullMethodName         = "/super_send.UsersService/DelUser"
+	UsersService_GetUsers_FullMethodName        = "/super_send.UsersService/GetUsers"
+	UsersService_LogOut_FullMethodName          = "/super_send.UsersService/LogOut"
+	UsersService_LogOutAll_FullMethodName       = "/super_send.UsersService/LogOutAll"
+	UsersService_SetPassword_FullMethodName     = "/super_send.UsersService/SetPassword"
+	UsersService_SetUserPassword_FullMethodName = "/super_send.UsersService/SetUserPassword"
+	UsersService_GetUserInfo_FullMethodName     = "/super_send.UsersService/GetUserInfo"
 )
 
 // UsersServiceClient is the client API for UsersService service.
@@ -424,7 +424,7 @@ func _UsersService_GetUserInfo_Handler(srv interface{}, ctx context.Context, dec
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var UsersService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "UsersService",
+	ServiceName: "super_send.UsersService",
 	HandlerType: (*UsersServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{

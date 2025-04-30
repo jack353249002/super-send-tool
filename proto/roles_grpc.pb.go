@@ -19,13 +19,13 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	RolesService_Add_FullMethodName                 = "/RolesService/Add"
-	RolesService_GetList_FullMethodName             = "/RolesService/GetList"
-	RolesService_GetRolesPermissions_FullMethodName = "/RolesService/GetRolesPermissions"
-	RolesService_DelRolesPermissions_FullMethodName = "/RolesService/DelRolesPermissions"
-	RolesService_DelRole_FullMethodName             = "/RolesService/DelRole"
-	RolesService_DelUserRole_FullMethodName         = "/RolesService/DelUserRole"
-	RolesService_AddRoleForUser_FullMethodName      = "/RolesService/AddRoleForUser"
+	RolesService_Add_FullMethodName                 = "/super_send.RolesService/Add"
+	RolesService_GetList_FullMethodName             = "/super_send.RolesService/GetList"
+	RolesService_GetRolesPermissions_FullMethodName = "/super_send.RolesService/GetRolesPermissions"
+	RolesService_DelRolesPermissions_FullMethodName = "/super_send.RolesService/DelRolesPermissions"
+	RolesService_DelRole_FullMethodName             = "/super_send.RolesService/DelRole"
+	RolesService_DelUserRole_FullMethodName         = "/super_send.RolesService/DelUserRole"
+	RolesService_AddRoleForUser_FullMethodName      = "/super_send.RolesService/AddRoleForUser"
 )
 
 // RolesServiceClient is the client API for RolesService service.
@@ -294,7 +294,7 @@ func _RolesService_AddRoleForUser_Handler(srv interface{}, ctx context.Context, 
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var RolesService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "RolesService",
+	ServiceName: "super_send.RolesService",
 	HandlerType: (*RolesServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
