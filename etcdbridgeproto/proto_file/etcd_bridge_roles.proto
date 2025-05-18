@@ -32,6 +32,13 @@ message RolesPermissions{
   string  path=2;
   string action=3;
 }
+message RoleDelRequest{
+  repeated RolesPermissions roles=1;
+}
+message DelRoleForUserRequest{
+  string role=1;
+  string  username=2;
+}
 message RolesPermissionsDelRequest{
   repeated RolesPermissions roles=1;
 }

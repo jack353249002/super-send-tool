@@ -38,6 +38,7 @@ func NewEtcdBridgeConnInfoDao(ctx context.Context, dbs ...*gorm.DB) *EtcdBridgeC
 		dao.sourceDB = dbs[0]
 		dao.replicaDB = dbs[1:]
 	}
+	dao.m = new(EtcdBridgeConnInfo)
 	return dao
 }
 
@@ -78,7 +79,14 @@ func (d *EtcdBridgeConnInfoDao) Update(ctx context.Context, where string, update
 	}
 	return nil
 }
-
+func (d *EtcdBridgeConnInfoDao) Count(ctx context.Context, fields, where string, args ...interface{}) (count int64, err error) {
+	err = d.replicaDB[rand.Intn(len(d.replicaDB))].Model(d.m).
+		Select(fields).Where(where, args...).Count(&count).Error
+	if err != nil {
+		return 0, fmt.Errorf("EtcdBridgeConnInfoDao: List where=%s: %w", where, err)
+	}
+	return
+}
 func (d *EtcdBridgeConnInfoDao) Delete(ctx context.Context, where string, args ...interface{}) error {
 	if len(where) == 0 {
 		return gorm.ErrInvalidData

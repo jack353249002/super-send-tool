@@ -31,8 +31,10 @@ service UsersService {
 }
 service RolesService {
   rpc  Add(RolesRequest) returns (BaseResponse){}  //添加
+  rpc  DelRole(RoleDelRequest) returns (BaseResponse){}
   rpc  GetList(RolesLisRequest) returns (BaseResponse){}   //获取列表
   rpc  GetRolesPermissions(RolesRequest) returns (BaseResponse){}  //获取权限
   rpc  DelRolesPermissions(RolesPermissionsDelRequest) returns (BaseResponse){} //删除权限
   rpc  AddRoleForUser(AddRoleForUserRequest) returns (BaseResponse){} //为用户添加角色
+  rpc  DelUserRole(DelRoleForUserRequest) returns (BaseResponse){}
 }
