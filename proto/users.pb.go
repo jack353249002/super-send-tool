@@ -21,18 +21,19 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// 消息发送双向数据流公共请求
 type MessageSendRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Route string `protobuf:"bytes,1,opt,name=route,proto3" json:"route,omitempty"`
+	Route string `protobuf:"bytes,1,opt,name=route,proto3" json:"route,omitempty"` //路由 login=登录 listenReceive=监听接收规则
 	// Types that are assignable to Payload:
 	//
 	//	*MessageSendRequest_LoginRequest
 	//	*MessageSendRequest_ListenReceiveRequest
 	Payload isMessageSendRequest_Payload `protobuf_oneof:"payload"`
-	Token   string                       `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"`
+	Token   string                       `protobuf:"bytes,4,opt,name=token,proto3" json:"token,omitempty"` //令牌 除了登录之外需要使用
 }
 
 func (x *MessageSendRequest) Reset() {
@@ -107,11 +108,11 @@ type isMessageSendRequest_Payload interface {
 }
 
 type MessageSendRequest_LoginRequest struct {
-	LoginRequest *LoginRequest `protobuf:"bytes,2,opt,name=login_request,json=loginRequest,proto3,oneof"`
+	LoginRequest *LoginRequest `protobuf:"bytes,2,opt,name=login_request,json=loginRequest,proto3,oneof"` //登录亲戚
 }
 
 type MessageSendRequest_ListenReceiveRequest struct {
-	ListenReceiveRequest *ListenReceiveRequest `protobuf:"bytes,3,opt,name=listen_receive_request,json=listenReceiveRequest,proto3,oneof"`
+	ListenReceiveRequest *ListenReceiveRequest `protobuf:"bytes,3,opt,name=listen_receive_request,json=listenReceiveRequest,proto3,oneof"` //监听请求
 }
 
 func (*MessageSendRequest_LoginRequest) isMessageSendRequest_Payload() {}
@@ -156,13 +157,14 @@ func (*MessageSend) Descriptor() ([]byte, []int) {
 	return file_users_proto_rawDescGZIP(), []int{1}
 }
 
+// 登录
 type LoginRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
-	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"` //用户名
+	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"` //密码
 }
 
 func (x *LoginRequest) Reset() {
@@ -211,13 +213,14 @@ func (x *LoginRequest) GetPassword() string {
 	return ""
 }
 
+// 注册
 type RegisterRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"`
-	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"`
+	Username string `protobuf:"bytes,1,opt,name=username,proto3" json:"username,omitempty"` //用户名
+	Password string `protobuf:"bytes,2,opt,name=password,proto3" json:"password,omitempty"` //密码
 }
 
 func (x *RegisterRequest) Reset() {
@@ -266,12 +269,13 @@ func (x *RegisterRequest) GetPassword() string {
 	return ""
 }
 
+// 监听接收规则邮件
 type ListenReceiveRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Ids []int64 `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"`
+	Ids []int64 `protobuf:"varint,1,rep,packed,name=ids,proto3" json:"ids,omitempty"` //receive id数组
 }
 
 func (x *ListenReceiveRequest) Reset() {
@@ -313,13 +317,14 @@ func (x *ListenReceiveRequest) GetIds() []int64 {
 	return nil
 }
 
+// 双向流响应数据
 type MessageSendResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Route string `protobuf:"bytes,1,opt,name=route,proto3" json:"route,omitempty"`
-	Code  uint32 `protobuf:"varint,2,opt,name=code,proto3" json:"code,omitempty"` //状态码 0=失败,1=成功
+	Route string `protobuf:"bytes,1,opt,name=route,proto3" json:"route,omitempty"` //路由 login=登录 listenReceive=监听接收规则
+	Code  uint32 `protobuf:"varint,2,opt,name=code,proto3" json:"code,omitempty"`  //状态码 0=失败,1=成功
 	// Types that are assignable to Payload:
 	//
 	//	*MessageSendResponse_LoginResponse
@@ -407,23 +412,24 @@ type isMessageSendResponse_Payload interface {
 }
 
 type MessageSendResponse_LoginResponse struct {
-	LoginResponse *LoginResponse `protobuf:"bytes,4,opt,name=login_response,json=loginResponse,proto3,oneof"`
+	LoginResponse *LoginResponse `protobuf:"bytes,4,opt,name=login_response,json=loginResponse,proto3,oneof"` //登录响应
 }
 
 type MessageSendResponse_MessageInfo struct {
-	MessageInfo *GetReceiveMessageInfo `protobuf:"bytes,5,opt,name=message_info,json=messageInfo,proto3,oneof"`
+	MessageInfo *GetReceiveMessageInfo `protobuf:"bytes,5,opt,name=message_info,json=messageInfo,proto3,oneof"` //接收消息响应
 }
 
 func (*MessageSendResponse_LoginResponse) isMessageSendResponse_Payload() {}
 
 func (*MessageSendResponse_MessageInfo) isMessageSendResponse_Payload() {}
 
+// 登录响应
 type LoginResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Token string `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	Token string `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"` //令牌
 }
 
 func (x *LoginResponse) Reset() {
@@ -465,12 +471,13 @@ func (x *LoginResponse) GetToken() string {
 	return ""
 }
 
+// 注册响应
 type RegisterResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Token string `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"`
+	Token string `protobuf:"bytes,1,opt,name=token,proto3" json:"token,omitempty"` //令牌
 }
 
 func (x *RegisterResponse) Reset() {
@@ -512,14 +519,15 @@ func (x *RegisterResponse) GetToken() string {
 	return ""
 }
 
+// 公共登录响应
 type LoginPublicResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Code          uint32         `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"` //状态码 0=失败,1=成功
-	LoginResponse *LoginResponse `protobuf:"bytes,2,opt,name=login_response,json=loginResponse,proto3" json:"login_response,omitempty"`
-	Message       string         `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"` //信息
+	Code          uint32         `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`                                       //状态码 0=失败,1=成功
+	LoginResponse *LoginResponse `protobuf:"bytes,2,opt,name=login_response,json=loginResponse,proto3" json:"login_response,omitempty"` //登录信息
+	Message       string         `protobuf:"bytes,3,opt,name=message,proto3" json:"message,omitempty"`                                  //信息
 }
 
 func (x *LoginPublicResponse) Reset() {
@@ -575,6 +583,7 @@ func (x *LoginPublicResponse) GetMessage() string {
 	return ""
 }
 
+// 注册响应
 type RegisterPublicResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -638,12 +647,13 @@ func (x *RegisterPublicResponse) GetMessage() string {
 	return ""
 }
 
+// 删除用户
 type DelUserRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` //用户id
 }
 
 func (x *DelUserRequest) Reset() {
@@ -685,6 +695,7 @@ func (x *DelUserRequest) GetId() int64 {
 	return 0
 }
 
+// 用户响应
 type UserResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -740,14 +751,15 @@ func (x *UserResponse) GetMessage() string {
 	return ""
 }
 
+// 获取用户请求
 type GetUsersRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	Keywords string `protobuf:"bytes,1,opt,name=keywords,proto3" json:"keywords,omitempty"` //关键字
-	Page     int64  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
-	Limit    int64  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	Page     int64  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`        //页码
+	Limit    int64  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`      //每页条数
 }
 
 func (x *GetUsersRequest) Reset() {
@@ -803,15 +815,16 @@ func (x *GetUsersRequest) GetLimit() int64 {
 	return 0
 }
 
+// 用户信息
 type User struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id       int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Username string   `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
-	IsRoot   uint32   `protobuf:"varint,3,opt,name=is_root,json=isRoot,proto3" json:"is_root,omitempty"`
-	Roles    []string `protobuf:"bytes,4,rep,name=roles,proto3" json:"roles,omitempty"`
+	Id       int64    `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                       //主键
+	Username string   `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`            //用户名
+	IsRoot   uint32   `protobuf:"varint,3,opt,name=is_root,json=isRoot,proto3" json:"is_root,omitempty"` //是否为root
+	Roles    []string `protobuf:"bytes,4,rep,name=roles,proto3" json:"roles,omitempty"`                  //用户角色
 }
 
 func (x *User) Reset() {
@@ -874,6 +887,7 @@ func (x *User) GetRoles() []string {
 	return nil
 }
 
+// 用户列表
 type UserListResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -881,8 +895,8 @@ type UserListResponse struct {
 
 	Code    uint32  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`      //状态码 0=失败,1=成功
 	Message string  `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"` //信息
-	Data    []*User `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`
-	Count   int64   `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`
+	Data    []*User `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`       //用户列表
+	Count   int64   `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`    //用户总数
 }
 
 func (x *UserListResponse) Reset() {
@@ -945,13 +959,14 @@ func (x *UserListResponse) GetCount() int64 {
 	return 0
 }
 
+// 设置密码
 type SetPasswordRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Password string `protobuf:"bytes,1,opt,name=password,proto3" json:"password,omitempty"`
-	UserId   int64  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"`
+	Password string `protobuf:"bytes,1,opt,name=password,proto3" json:"password,omitempty"`            //密码
+	UserId   int64  `protobuf:"varint,2,opt,name=user_id,json=userId,proto3" json:"user_id,omitempty"` //用户id
 }
 
 func (x *SetPasswordRequest) Reset() {
@@ -1000,12 +1015,13 @@ func (x *SetPasswordRequest) GetUserId() int64 {
 	return 0
 }
 
+// 获取用户信息
 type GetUserInfoRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` //用户id
 }
 
 func (x *GetUserInfoRequest) Reset() {
@@ -1047,6 +1063,7 @@ func (x *GetUserInfoRequest) GetId() int64 {
 	return 0
 }
 
+// 用户信息响应
 type UserInfoResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

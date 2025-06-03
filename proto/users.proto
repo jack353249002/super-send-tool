@@ -3,101 +3,125 @@ package super_send;
 option go_package = ".;proto"; // 替换为您的实际包路径
 import "receive.proto";
 import "google/protobuf/empty.proto";
+//消息发送双向数据流公共请求
 message MessageSendRequest{
-    string route = 1;
+    string route = 1;   //路由 login=登录 listenReceive=监听接收规则
     oneof payload {
-        LoginRequest login_request = 2;
-        ListenReceiveRequest listen_receive_request = 3;
+        LoginRequest login_request = 2;   //登录亲戚
+        ListenReceiveRequest listen_receive_request = 3;   //监听请求
     }
-    string token=4;
+    string token=4;   //令牌 除了登录之外需要使用
 }
 message MessageSend{
 
 }
+//登录
 message LoginRequest{
-    string username=1;
-    string password=2;
+    string username=1;  //用户名
+    string password=2;  //密码
 }
+//注册
 message RegisterRequest{
-    string username=1;
-    string password=2;
+    string username=1;  //用户名
+    string password=2;  //密码
 }
-
+//监听接收规则邮件
 message ListenReceiveRequest{
-    repeated int64 ids=1;
+    repeated int64 ids=1;  //receive id数组
 }
-
+//双向流响应数据
 message MessageSendResponse{
-    string route = 1;
+    string route = 1;  //路由 login=登录 listenReceive=监听接收规则
     uint32 code=2; //状态码 0=失败,1=成功
     oneof payload {
-        LoginResponse login_response =4;
-        GetReceiveMessageInfo message_info = 5;
+        LoginResponse login_response =4;   //登录响应
+        GetReceiveMessageInfo message_info = 5;  //接收消息响应
     }
     string message=3;//信息
 }
+//登录响应
 message LoginResponse{
-    string token=1;
+    string token=1;  //令牌
 }
+//注册响应
 message RegisterResponse{
-    string token=1;
+    string token=1;  //令牌
 }
+//公共登录响应
 message LoginPublicResponse{
     uint32 code=1; //状态码 0=失败,1=成功
-    LoginResponse login_response =2;
+    LoginResponse login_response =2; //登录信息
     string message=3;//信息
 }
+//注册响应
 message RegisterPublicResponse{
     uint32 code = 1; //状态码 0=失败,1=成功
     RegisterResponse register_response = 2;
     string message = 3;//信息
 }
+//删除用户
 message DelUserRequest{
-    int64 id=1;
+    int64 id=1;  //用户id
 }
+//用户响应
 message UserResponse{
     uint32 code = 1; //状态码 0=失败,1=成功
     string message = 2;//信息
 }
+//获取用户请求
 message GetUsersRequest{
     string keywords = 1;  //关键字
-    int64 page=2;
-    int64 limit=3;
+    int64 page=2;   //页码
+    int64 limit=3;  //每页条数
 }
-
+//用户信息
 message User{
-    int64  id=1;
-    string username=2;
-    uint32 is_root=3;
-    repeated string roles=4;
+    int64  id=1;   //主键
+    string username=2;   //用户名
+    uint32 is_root=3;    //是否为root
+    repeated string roles=4;  //用户角色
 }
+//用户列表
 message UserListResponse{
     uint32 code=1; //状态码 0=失败,1=成功
     string message=2;//信息
-    repeated User data=3;
-    int64 count=4;
+    repeated User data=3; //用户列表
+    int64 count=4;  //用户总数
 }
+//设置密码
 message SetPasswordRequest{
-    string password=1;
-    int64 user_id=2;
+    string password=1;  //密码
+    int64 user_id=2;   //用户id
 }
+//获取用户信息
 message GetUserInfoRequest{
-    int64 id=1;
+    int64 id=1;   //用户id
 }
+//用户信息响应
 message UserInfoResponse{
     uint32 code = 1; //状态码 0=失败,1=成功
     string message = 2;//信息
     User data=3;
 }
 service UsersService {
+    //长连接进行用户登录和监听接收邮件
     rpc MessageSend(stream MessageSendRequest) returns (stream MessageSendResponse){}
+    //登录
     rpc Login(LoginRequest) returns (LoginPublicResponse){}
+    //注册
     rpc Register(RegisterRequest) returns (RegisterPublicResponse){}
+    //删除用户
     rpc DelUser(DelUserRequest) returns (UserResponse){}
+    //获取用户列表
     rpc GetUsers(GetUsersRequest) returns (UserListResponse){}
+    //退出登录
     rpc LogOut(google.protobuf.Empty) returns (UserResponse){}
+    //退出所有登录
     rpc LogOutAll(google.protobuf.Empty) returns (UserResponse){}
+    //设置密码
     rpc SetPassword(SetPasswordRequest) returns (UserResponse){}
+    //设置用户密码
     rpc SetUserPassword(SetPasswordRequest) returns (UserResponse){}
+    //获取用户信息
     rpc GetUserInfo(GetUserInfoRequest) returns (UserInfoResponse){}
 }

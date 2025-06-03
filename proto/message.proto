@@ -1,6 +1,7 @@
 syntax = "proto3";
 package super_send;
 option go_package = ".;proto"; // 替换为您的实际包路径
+//消息请求
 message MessageRequest{
     int64  id=1;        //主键
     string title = 2;  //标题
@@ -8,43 +9,53 @@ message MessageRequest{
     string attach = 4;  //附件
     string content_type=5; //内容类型
 }
+//消息响应
 message MessageResponse{
     uint32 code=1; //状态码 0=失败,1=成功
     string message=2;//信息
 }
+//消息列表请求
 message MessageListRequest{
     string title = 1;  //标题
-    int64 start_time=2;
-    int64 end_time=3;
-    int64 page=4;
-    int64 limit=5;
+    int64 start_time=2; //开始时间
+    int64 end_time=3;   //结束时间
+    int64 page=4;       //起始页
+    int64 limit=5;      //每页条数
 }
+//消息信息
 message MessageList{
-   int64  id=5;
-   string title=1;
-   string body=2;
-   string attach=3;
-   int64 createtime=4;
+   int64  id=5;    //主键
+   string title=1;  //标题
+   string body=2;   //详情
+   string attach=3;  //附件
+   int64 createtime=4;  //创建时间
    string content_type=6; //内容类型
 }
+//消息列表响应
 message MessageListResponse{
     uint32 code=1; //状态码 0=失败,1=成功
     string message=2;//信息
-    repeated MessageList data=3;
-    int64 count=4;
+    repeated MessageList data=3;   //消息列表
+    int64 count=4;   //总数
 }
+//上传文件请求
 message FileRequest{
-    bytes data = 1;  //数据
+    bytes data = 1;  //文件字节流数据
     string file_name=2;//文件名
 }
+//上传文件响应
 message FileResponse{
     uint32 code=1; //状态码 0=失败,1=成功
     string message=2;//信息
-    string data=3;
+    string data=3;  //文件路径
 }
 service MessageService {
+    //设置消息
     rpc SetMessage(MessageRequest) returns (MessageResponse){}
+    //删除消息
     rpc DelMessage(MessageRequest) returns (MessageResponse){}
+    //上传文件
     rpc UploadFile(FileRequest) returns (FileResponse){}
+    //获取消息列表
     rpc GetMessageList(MessageListRequest) returns (MessageListResponse){}
 }

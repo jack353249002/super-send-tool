@@ -21,14 +21,15 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// 配置
 type Conf struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id  int64  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
-	Val string `protobuf:"bytes,3,opt,name=val,proto3" json:"val,omitempty"`
+	Id  int64  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`  //主键
+	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"` //key
+	Val string `protobuf:"bytes,3,opt,name=val,proto3" json:"val,omitempty"` //值
 }
 
 func (x *Conf) Reset() {
@@ -84,12 +85,13 @@ func (x *Conf) GetVal() string {
 	return ""
 }
 
+// 获取配置列表
 type GetConfListRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Keywords string `protobuf:"bytes,1,opt,name=keywords,proto3" json:"keywords,omitempty"` //关键字
+	Keywords string `protobuf:"bytes,1,opt,name=keywords,proto3" json:"keywords,omitempty"` //搜索关键字
 }
 
 func (x *GetConfListRequest) Reset() {
@@ -131,15 +133,16 @@ func (x *GetConfListRequest) GetKeywords() string {
 	return ""
 }
 
+// 配置列表响应
 type ConfListResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Data    []*Conf `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`
+	Data    []*Conf `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`       //配置列表数组
 	Code    uint32  `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`      //状态码 0=失败,1=成功
 	Message string  `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"` //信息
-	Count   int64   `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`
+	Count   int64   `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`    //总条数
 }
 
 func (x *ConfListResponse) Reset() {
@@ -202,14 +205,15 @@ func (x *ConfListResponse) GetCount() int64 {
 	return 0
 }
 
+// 设置配置请求
 type SetConfRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id  int64  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"`
-	Val string `protobuf:"bytes,3,opt,name=val,proto3" json:"val,omitempty"`
+	Id  int64  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`  //主键
+	Key string `protobuf:"bytes,2,opt,name=key,proto3" json:"key,omitempty"` //key
+	Val string `protobuf:"bytes,3,opt,name=val,proto3" json:"val,omitempty"` //值
 }
 
 func (x *SetConfRequest) Reset() {
@@ -265,6 +269,7 @@ func (x *SetConfRequest) GetVal() string {
 	return ""
 }
 
+// 删除配置
 type DelConfRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -312,6 +317,7 @@ func (x *DelConfRequest) GetId() int64 {
 	return 0
 }
 
+// 配置响应
 type ConfResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

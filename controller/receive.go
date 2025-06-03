@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
+	client2 "super-send-tool/client"
 	"super-send-tool/grpccons"
 	"super-send-tool/model/request"
 	"super-send-tool/model/response"
@@ -40,7 +41,7 @@ func AddReceive(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	ctx = metadata.NewOutgoingContext(ctx, md)
-	res, err := client.AddReceive(ctx, &proto.AddReceiveRequest{Title: receive.Title, ReceiveModel: int64(receive.ReceiveModel), ReceiveRule: receive.ReceiveRule, ReceiveServerId: receive.ReceiveServerID, EndType: int64(receive.EndType), EndRule: receive.EndRule, Status: int64(receive.Status)})
+	res, err := client.AddReceive(ctx, &proto.SetReceiveRequest{Title: receive.Title, ReceiveModel: int64(receive.ReceiveModel), ReceiveRule: receive.ReceiveRule, ReceiveServerId: receive.ReceiveServerID, EndType: int64(receive.EndType), EndRule: receive.EndRule, Status: int64(receive.Status)})
 	if err != nil {
 		ResponseFailed(c, nil, err.Error())
 		return
@@ -53,6 +54,34 @@ func AddReceive(c *gin.Context) {
 		return
 	}
 	return
+}
+
+// @Summary 监听新邮件信息
+// @Router /super_send/addNewReceiveEmailMessageListen [POST]
+func AddNewReceiveEmailMessageListen(c *gin.Context) {
+	var receiveEmailMessageListen request.ListenReceiveMessage
+	err := c.ShouldBind(&receiveEmailMessageListen)
+	if err != nil {
+		// 提取验证错误信息
+		errors := validate.SuperSendErrorMessages(err)
+		ResponseFailed(c, nil, validate.GetAllErrorStr(errors))
+		return
+	}
+	con := grpccons.SuperSendGroupAction.Get(c.GetInt("super_send_id"))
+	if con == nil {
+		ResponseFailed(c, nil, "连接失败")
+		return
+	}
+	receiveClient := client2.PublicClientPool.GetClient(c.GetInt("super_send_id"))
+	if receiveClient != nil {
+		receiveClient.ListenReceive(receiveEmailMessageListen.IDs, c.GetString("token"), con.UserName)
+		ResponseSuccess(c, nil, "listen success")
+		return
+	} else {
+		ResponseFailed(c, nil, "listen error")
+		return
+	}
+
 }
 
 // @Summary 设置接收规则
@@ -79,7 +108,7 @@ func SetReceive(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	ctx = metadata.NewOutgoingContext(ctx, md)
-	res, err := client.SetReceive(ctx, &proto.AddReceiveRequest{Id: int64(receive.ID), ReceiveServerId: receive.ReceiveServerID})
+	res, err := client.SetReceive(ctx, &proto.SetReceiveRequest{Id: int64(receive.ID), ReceiveServerId: receive.ReceiveServerID})
 	if err != nil {
 		ResponseFailed(c, nil, err.Error())
 		return

@@ -83,6 +83,7 @@ func SuperSendRouter(r *gin.Engine) {
 		v1.POST("/getReceiveMessagesList", controller.GetReceiveMessagesList)
 		v1.POST("/getReceiveMessageInfo", controller.GetReceiveMessagesInfo)
 		v1.POST("/receiveAction", controller.ReceiveAction)
+		v1.POST("/addNewReceiveEmailMessageListen", controller.AddNewReceiveEmailMessageListen)
 
 		v1.POST("/getImapServer", controller.GetImapServer)
 		v1.POST("/setImapServer", controller.SetImapServer)

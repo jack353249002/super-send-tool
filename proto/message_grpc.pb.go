@@ -29,9 +29,13 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type MessageServiceClient interface {
+	// 设置消息
 	SetMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	// 删除消息
 	DelMessage(ctx context.Context, in *MessageRequest, opts ...grpc.CallOption) (*MessageResponse, error)
+	// 上传文件
 	UploadFile(ctx context.Context, in *FileRequest, opts ...grpc.CallOption) (*FileResponse, error)
+	// 获取消息列表
 	GetMessageList(ctx context.Context, in *MessageListRequest, opts ...grpc.CallOption) (*MessageListResponse, error)
 }
 
@@ -83,9 +87,13 @@ func (c *messageServiceClient) GetMessageList(ctx context.Context, in *MessageLi
 // All implementations must embed UnimplementedMessageServiceServer
 // for forward compatibility
 type MessageServiceServer interface {
+	// 设置消息
 	SetMessage(context.Context, *MessageRequest) (*MessageResponse, error)
+	// 删除消息
 	DelMessage(context.Context, *MessageRequest) (*MessageResponse, error)
+	// 上传文件
 	UploadFile(context.Context, *FileRequest) (*FileResponse, error)
+	// 获取消息列表
 	GetMessageList(context.Context, *MessageListRequest) (*MessageListResponse, error)
 	mustEmbedUnimplementedMessageServiceServer()
 }

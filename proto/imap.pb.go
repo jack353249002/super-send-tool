@@ -21,18 +21,19 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// imap服务对象
 type ImapServerObj struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id           int64  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	ImapServer   string `protobuf:"bytes,2,opt,name=imap_server,json=imapServer,proto3" json:"imap_server,omitempty"`
-	ImapPassword string `protobuf:"bytes,3,opt,name=imap_password,json=imapPassword,proto3" json:"imap_password,omitempty"`
-	Title        string `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
-	ImapEmail    string `protobuf:"bytes,5,opt,name=imap_email,json=imapEmail,proto3" json:"imap_email,omitempty"`
-	Port         int64  `protobuf:"varint,6,opt,name=port,proto3" json:"port,omitempty"`
-	MaxClient    int64  `protobuf:"varint,7,opt,name=max_client,json=maxClient,proto3" json:"max_client,omitempty"`
+	Id           int64  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                        //主键
+	ImapServer   string `protobuf:"bytes,2,opt,name=imap_server,json=imapServer,proto3" json:"imap_server,omitempty"`       //imap 服务器主机地址  如 imap.163.com
+	ImapPassword string `protobuf:"bytes,3,opt,name=imap_password,json=imapPassword,proto3" json:"imap_password,omitempty"` //imap 密码
+	Title        string `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`                                   //标题
+	ImapEmail    string `protobuf:"bytes,5,opt,name=imap_email,json=imapEmail,proto3" json:"imap_email,omitempty"`          //imap 邮箱 用哪个邮箱号发送
+	Port         int64  `protobuf:"varint,6,opt,name=port,proto3" json:"port,omitempty"`                                    //端口
+	MaxClient    int64  `protobuf:"varint,7,opt,name=max_client,json=maxClient,proto3" json:"max_client,omitempty"`         //最大客户端数
 }
 
 func (x *ImapServerObj) Reset() {
@@ -116,14 +117,15 @@ func (x *ImapServerObj) GetMaxClient() int64 {
 	return 0
 }
 
+// 获取imap列表请求
 type GetImapListRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
 	Keywords string `protobuf:"bytes,1,opt,name=keywords,proto3" json:"keywords,omitempty"` //关键字
-	Page     int64  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
-	Limit    int64  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`
+	Page     int64  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`        //页数
+	Limit    int64  `protobuf:"varint,3,opt,name=limit,proto3" json:"limit,omitempty"`      //每页条数
 }
 
 func (x *GetImapListRequest) Reset() {
@@ -179,15 +181,16 @@ func (x *GetImapListRequest) GetLimit() int64 {
 	return 0
 }
 
+// imap列表响应
 type ImapServerListResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Data    []*ImapServerObj `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`
+	Data    []*ImapServerObj `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`       //imap服务列表
 	Code    uint32           `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`      //状态码 0=失败,1=成功
 	Message string           `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"` //信息
-	Count   int64            `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`
+	Count   int64            `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`    //总条数
 }
 
 func (x *ImapServerListResponse) Reset() {
@@ -250,18 +253,19 @@ func (x *ImapServerListResponse) GetCount() int64 {
 	return 0
 }
 
+// 设置imap请求
 type SetImapRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id           int64  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
-	ImapServer   string `protobuf:"bytes,2,opt,name=imap_server,json=imapServer,proto3" json:"imap_server,omitempty"`
-	ImapPassword string `protobuf:"bytes,3,opt,name=imap_password,json=imapPassword,proto3" json:"imap_password,omitempty"`
-	Title        string `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`
-	ImapEmail    string `protobuf:"bytes,5,opt,name=imap_email,json=imapEmail,proto3" json:"imap_email,omitempty"`
-	Port         int64  `protobuf:"varint,6,opt,name=port,proto3" json:"port,omitempty"`
-	MaxClient    int64  `protobuf:"varint,7,opt,name=max_client,json=maxClient,proto3" json:"max_client,omitempty"`
+	Id           int64  `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`                                        //主键
+	ImapServer   string `protobuf:"bytes,2,opt,name=imap_server,json=imapServer,proto3" json:"imap_server,omitempty"`       //imap 服务器主机地址  如 imap.163.com
+	ImapPassword string `protobuf:"bytes,3,opt,name=imap_password,json=imapPassword,proto3" json:"imap_password,omitempty"` //imap 密码
+	Title        string `protobuf:"bytes,4,opt,name=title,proto3" json:"title,omitempty"`                                   //标题
+	ImapEmail    string `protobuf:"bytes,5,opt,name=imap_email,json=imapEmail,proto3" json:"imap_email,omitempty"`          //imap 邮箱 用哪个邮箱号发送
+	Port         int64  `protobuf:"varint,6,opt,name=port,proto3" json:"port,omitempty"`                                    //端口
+	MaxClient    int64  `protobuf:"varint,7,opt,name=max_client,json=maxClient,proto3" json:"max_client,omitempty"`         //最大客户端数
 }
 
 func (x *SetImapRequest) Reset() {
@@ -345,12 +349,13 @@ func (x *SetImapRequest) GetMaxClient() int64 {
 	return 0
 }
 
+// 删除imap请求
 type DelImapRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"`
+	Id int64 `protobuf:"varint,1,opt,name=id,proto3" json:"id,omitempty"` //主键
 }
 
 func (x *DelImapRequest) Reset() {
@@ -392,6 +397,7 @@ func (x *DelImapRequest) GetId() int64 {
 	return 0
 }
 
+// 设置imap响应
 type SetImapResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache

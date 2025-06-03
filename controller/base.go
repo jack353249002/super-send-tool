@@ -16,7 +16,7 @@ import (
 
 var ReloadSignal = ReloadSignalModel{
 	Token: "",
-	Logs:  make([]*proto.SetSmtpResponse, 0),
+	Logs:  make([]*proto.SmtpResponse, 0),
 }
 
 // 重新加载服务信号
@@ -24,7 +24,7 @@ type ReloadSignalModel struct {
 	Locker      sync.Mutex
 	TokenLocker sync.Mutex
 	Token       string //访问令牌
-	Logs        []*proto.SetSmtpResponse
+	Logs        []*proto.SmtpResponse
 	IsEnd       bool
 	Context     *gin.Context
 	EndTime     int64 //当前令牌的结束时间
@@ -63,7 +63,7 @@ func (r *ReloadSignalModel) Reload() {
 		}()
 		con := grpccons.SuperSendGroupAction.Get(r.Context.GetInt("super_send_id"))
 		if con == nil {
-			r.AddLog(&proto.SetSmtpResponse{Code: 0, Message: "连接失败"})
+			r.AddLog(&proto.SmtpResponse{Code: 0, Message: "连接失败"})
 			return
 		}
 		client := proto.NewSmtpServiceClient(con.Conn)
@@ -76,7 +76,7 @@ func (r *ReloadSignalModel) Reload() {
 		ctx = metadata.NewOutgoingContext(ctx, md)
 		res, err := client.Reload(ctx, &empty.Empty{})
 		if err != nil {
-			r.AddLog(&proto.SetSmtpResponse{Code: 0, Message: err.Error()})
+			r.AddLog(&proto.SmtpResponse{Code: 0, Message: err.Error()})
 			return
 		} else {
 			for {
@@ -85,7 +85,7 @@ func (r *ReloadSignalModel) Reload() {
 					break
 				}
 				if err != nil {
-					r.AddLog(&proto.SetSmtpResponse{Code: 0, Message: err.Error()})
+					r.AddLog(&proto.SmtpResponse{Code: 0, Message: err.Error()})
 					return
 				}
 				r.AddLog(resp)
@@ -95,9 +95,9 @@ func (r *ReloadSignalModel) Reload() {
 	}()
 }
 func (r *ReloadSignalModel) ClearLog() {
-	r.Logs = make([]*proto.SetSmtpResponse, 0)
+	r.Logs = make([]*proto.SmtpResponse, 0)
 }
-func (r *ReloadSignalModel) AddLog(log *proto.SetSmtpResponse) {
+func (r *ReloadSignalModel) AddLog(log *proto.SmtpResponse) {
 	r.Logs = append(r.Logs, log)
 }
 

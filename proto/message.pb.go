@@ -20,6 +20,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// 消息请求
 type MessageRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -99,6 +100,7 @@ func (x *MessageRequest) GetContentType() string {
 	return ""
 }
 
+// 消息响应
 type MessageResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -154,16 +156,17 @@ func (x *MessageResponse) GetMessage() string {
 	return ""
 }
 
+// 消息列表请求
 type MessageListRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Title     string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"` //标题
-	StartTime int64  `protobuf:"varint,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"`
-	EndTime   int64  `protobuf:"varint,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`
-	Page      int64  `protobuf:"varint,4,opt,name=page,proto3" json:"page,omitempty"`
-	Limit     int64  `protobuf:"varint,5,opt,name=limit,proto3" json:"limit,omitempty"`
+	Title     string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`                           //标题
+	StartTime int64  `protobuf:"varint,2,opt,name=start_time,json=startTime,proto3" json:"start_time,omitempty"` //开始时间
+	EndTime   int64  `protobuf:"varint,3,opt,name=end_time,json=endTime,proto3" json:"end_time,omitempty"`       //结束时间
+	Page      int64  `protobuf:"varint,4,opt,name=page,proto3" json:"page,omitempty"`                            //起始页
+	Limit     int64  `protobuf:"varint,5,opt,name=limit,proto3" json:"limit,omitempty"`                          //每页条数
 }
 
 func (x *MessageListRequest) Reset() {
@@ -233,16 +236,17 @@ func (x *MessageListRequest) GetLimit() int64 {
 	return 0
 }
 
+// 消息信息
 type MessageList struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Id          int64  `protobuf:"varint,5,opt,name=id,proto3" json:"id,omitempty"`
-	Title       string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`
-	Body        string `protobuf:"bytes,2,opt,name=body,proto3" json:"body,omitempty"`
-	Attach      string `protobuf:"bytes,3,opt,name=attach,proto3" json:"attach,omitempty"`
-	Createtime  int64  `protobuf:"varint,4,opt,name=createtime,proto3" json:"createtime,omitempty"`
+	Id          int64  `protobuf:"varint,5,opt,name=id,proto3" json:"id,omitempty"`                                     //主键
+	Title       string `protobuf:"bytes,1,opt,name=title,proto3" json:"title,omitempty"`                                //标题
+	Body        string `protobuf:"bytes,2,opt,name=body,proto3" json:"body,omitempty"`                                  //详情
+	Attach      string `protobuf:"bytes,3,opt,name=attach,proto3" json:"attach,omitempty"`                              //附件
+	Createtime  int64  `protobuf:"varint,4,opt,name=createtime,proto3" json:"createtime,omitempty"`                     //创建时间
 	ContentType string `protobuf:"bytes,6,opt,name=content_type,json=contentType,proto3" json:"content_type,omitempty"` //内容类型
 }
 
@@ -320,6 +324,7 @@ func (x *MessageList) GetContentType() string {
 	return ""
 }
 
+// 消息列表响应
 type MessageListResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -327,8 +332,8 @@ type MessageListResponse struct {
 
 	Code    uint32         `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`      //状态码 0=失败,1=成功
 	Message string         `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"` //信息
-	Data    []*MessageList `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`
-	Count   int64          `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`
+	Data    []*MessageList `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`       //消息列表
+	Count   int64          `protobuf:"varint,4,opt,name=count,proto3" json:"count,omitempty"`    //总数
 }
 
 func (x *MessageListResponse) Reset() {
@@ -391,12 +396,13 @@ func (x *MessageListResponse) GetCount() int64 {
 	return 0
 }
 
+// 上传文件请求
 type FileRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Data     []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`                         //数据
+	Data     []byte `protobuf:"bytes,1,opt,name=data,proto3" json:"data,omitempty"`                         //文件字节流数据
 	FileName string `protobuf:"bytes,2,opt,name=file_name,json=fileName,proto3" json:"file_name,omitempty"` //文件名
 }
 
@@ -446,6 +452,7 @@ func (x *FileRequest) GetFileName() string {
 	return ""
 }
 
+// 上传文件响应
 type FileResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -453,7 +460,7 @@ type FileResponse struct {
 
 	Code    uint32 `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`      //状态码 0=失败,1=成功
 	Message string `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"` //信息
-	Data    string `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`
+	Data    string `protobuf:"bytes,3,opt,name=data,proto3" json:"data,omitempty"`       //文件路径
 }
 
 func (x *FileResponse) Reset() {

@@ -20,13 +20,14 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// 添加角色给用户
 type AddRoleForUserRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Role     string `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`
-	Username string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Role     string `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`         //角色
+	Username string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"` //用户名
 }
 
 func (x *AddRoleForUserRequest) Reset() {
@@ -75,13 +76,14 @@ func (x *AddRoleForUserRequest) GetUsername() string {
 	return ""
 }
 
+// 删除用户角色
 type DelRoleForUserRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Role     string `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`
-	Username string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"`
+	Role     string `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`         //角色
+	Username string `protobuf:"bytes,2,opt,name=username,proto3" json:"username,omitempty"` //用户名
 }
 
 func (x *DelRoleForUserRequest) Reset() {
@@ -130,13 +132,14 @@ func (x *DelRoleForUserRequest) GetUsername() string {
 	return ""
 }
 
+// 角色
 type Roles struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Role   string   `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`
-	Path   string   `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
+	Role   string   `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"` //角色
+	Path   string   `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"` //访问地址  /api/v1/user  /api/*
 	Action []string `protobuf:"bytes,3,rep,name=action,proto3" json:"action,omitempty"`
 }
 
@@ -193,14 +196,15 @@ func (x *Roles) GetAction() []string {
 	return nil
 }
 
+// 设置角色请求
 type RolesRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Role   string   `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`
-	Path   string   `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
-	Action []string `protobuf:"bytes,3,rep,name=action,proto3" json:"action,omitempty"`
+	Role   string   `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`     //角色
+	Path   string   `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`     //访问地址
+	Action []string `protobuf:"bytes,3,rep,name=action,proto3" json:"action,omitempty"` //操作类型，目前无用直接传 *号
 }
 
 func (x *RolesRequest) Reset() {
@@ -256,14 +260,15 @@ func (x *RolesRequest) GetAction() []string {
 	return nil
 }
 
+// 角色列表请求
 type RolesLisRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	SearchKey string `protobuf:"bytes,1,opt,name=search_key,json=searchKey,proto3" json:"search_key,omitempty"`
-	Page      int64  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`
-	PageSize  int64  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`
+	SearchKey string `protobuf:"bytes,1,opt,name=search_key,json=searchKey,proto3" json:"search_key,omitempty"` //搜索key
+	Page      int64  `protobuf:"varint,2,opt,name=page,proto3" json:"page,omitempty"`                           //页码
+	PageSize  int64  `protobuf:"varint,3,opt,name=page_size,json=pageSize,proto3" json:"page_size,omitempty"`   //每页条数
 }
 
 func (x *RolesLisRequest) Reset() {
@@ -319,6 +324,7 @@ func (x *RolesLisRequest) GetPageSize() int64 {
 	return 0
 }
 
+// 角色列表响应
 type RolesResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -374,6 +380,7 @@ func (x *RolesResponse) GetMessage() string {
 	return ""
 }
 
+// 角色列表响应
 type RolesListResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
@@ -381,8 +388,8 @@ type RolesListResponse struct {
 
 	Code    uint32   `protobuf:"varint,1,opt,name=code,proto3" json:"code,omitempty"`      //状态码 0=失败,1=成功
 	Message string   `protobuf:"bytes,2,opt,name=message,proto3" json:"message,omitempty"` //信息
-	Data    []*Roles `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`
-	Total   int64    `protobuf:"varint,4,opt,name=total,proto3" json:"total,omitempty"`
+	Data    []*Roles `protobuf:"bytes,3,rep,name=data,proto3" json:"data,omitempty"`       //角色列表
+	Total   int64    `protobuf:"varint,4,opt,name=total,proto3" json:"total,omitempty"`    //总条数
 }
 
 func (x *RolesListResponse) Reset() {
@@ -445,14 +452,15 @@ func (x *RolesListResponse) GetTotal() int64 {
 	return 0
 }
 
+// 角色权限
 type RolesPermissions struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Role   string `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`
-	Path   string `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`
-	Action string `protobuf:"bytes,3,opt,name=action,proto3" json:"action,omitempty"`
+	Role   string `protobuf:"bytes,1,opt,name=role,proto3" json:"role,omitempty"`     //角色
+	Path   string `protobuf:"bytes,2,opt,name=path,proto3" json:"path,omitempty"`     //访问地址
+	Action string `protobuf:"bytes,3,opt,name=action,proto3" json:"action,omitempty"` //操作
 }
 
 func (x *RolesPermissions) Reset() {
@@ -508,12 +516,13 @@ func (x *RolesPermissions) GetAction() string {
 	return ""
 }
 
+// 删除角色权限
 type RolesPermissionsDelRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Roles []*RolesPermissions `protobuf:"bytes,1,rep,name=roles,proto3" json:"roles,omitempty"`
+	Roles []*RolesPermissions `protobuf:"bytes,1,rep,name=roles,proto3" json:"roles,omitempty"` //权限列表
 }
 
 func (x *RolesPermissionsDelRequest) Reset() {
@@ -555,12 +564,13 @@ func (x *RolesPermissionsDelRequest) GetRoles() []*RolesPermissions {
 	return nil
 }
 
+// 删除角色
 type RoleDelRequest struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Roles []*RolesPermissions `protobuf:"bytes,1,rep,name=roles,proto3" json:"roles,omitempty"`
+	Roles []*RolesPermissions `protobuf:"bytes,1,rep,name=roles,proto3" json:"roles,omitempty"` //RolesPermissions数组只需要传 role
 }
 
 func (x *RoleDelRequest) Reset() {
@@ -602,13 +612,14 @@ func (x *RoleDelRequest) GetRoles() []*RolesPermissions {
 	return nil
 }
 
+// 角色权限列表
 type RolesPermissionsListResponse struct {
 	state         protoimpl.MessageState
 	sizeCache     protoimpl.SizeCache
 	unknownFields protoimpl.UnknownFields
 
-	Data    []*RolesPermissions `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`
-	Total   int64               `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
+	Data    []*RolesPermissions `protobuf:"bytes,1,rep,name=data,proto3" json:"data,omitempty"`       //列表
+	Total   int64               `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`    //总条数
 	Code    uint32              `protobuf:"varint,3,opt,name=code,proto3" json:"code,omitempty"`      //状态码 0=失败,1=成功
 	Message string              `protobuf:"bytes,4,opt,name=message,proto3" json:"message,omitempty"` //信息
 }

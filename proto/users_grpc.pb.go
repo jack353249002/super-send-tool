@@ -36,15 +36,25 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type UsersServiceClient interface {
+	// 长连接进行用户登录和监听接收邮件
 	MessageSend(ctx context.Context, opts ...grpc.CallOption) (UsersService_MessageSendClient, error)
+	// 登录
 	Login(ctx context.Context, in *LoginRequest, opts ...grpc.CallOption) (*LoginPublicResponse, error)
+	// 注册
 	Register(ctx context.Context, in *RegisterRequest, opts ...grpc.CallOption) (*RegisterPublicResponse, error)
+	// 删除用户
 	DelUser(ctx context.Context, in *DelUserRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	// 获取用户列表
 	GetUsers(ctx context.Context, in *GetUsersRequest, opts ...grpc.CallOption) (*UserListResponse, error)
+	// 退出登录
 	LogOut(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*UserResponse, error)
+	// 退出所有登录
 	LogOutAll(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*UserResponse, error)
+	// 设置密码
 	SetPassword(ctx context.Context, in *SetPasswordRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	// 设置用户密码
 	SetUserPassword(ctx context.Context, in *SetPasswordRequest, opts ...grpc.CallOption) (*UserResponse, error)
+	// 获取用户信息
 	GetUserInfo(ctx context.Context, in *GetUserInfoRequest, opts ...grpc.CallOption) (*UserInfoResponse, error)
 }
 
@@ -172,15 +182,25 @@ func (c *usersServiceClient) GetUserInfo(ctx context.Context, in *GetUserInfoReq
 // All implementations must embed UnimplementedUsersServiceServer
 // for forward compatibility
 type UsersServiceServer interface {
+	// 长连接进行用户登录和监听接收邮件
 	MessageSend(UsersService_MessageSendServer) error
+	// 登录
 	Login(context.Context, *LoginRequest) (*LoginPublicResponse, error)
+	// 注册
 	Register(context.Context, *RegisterRequest) (*RegisterPublicResponse, error)
+	// 删除用户
 	DelUser(context.Context, *DelUserRequest) (*UserResponse, error)
+	// 获取用户列表
 	GetUsers(context.Context, *GetUsersRequest) (*UserListResponse, error)
+	// 退出登录
 	LogOut(context.Context, *empty.Empty) (*UserResponse, error)
+	// 退出所有登录
 	LogOutAll(context.Context, *empty.Empty) (*UserResponse, error)
+	// 设置密码
 	SetPassword(context.Context, *SetPasswordRequest) (*UserResponse, error)
+	// 设置用户密码
 	SetUserPassword(context.Context, *SetPasswordRequest) (*UserResponse, error)
+	// 获取用户信息
 	GetUserInfo(context.Context, *GetUserInfoRequest) (*UserInfoResponse, error)
 	mustEmbedUnimplementedUsersServiceServer()
 }

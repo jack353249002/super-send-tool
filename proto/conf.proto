@@ -2,36 +2,46 @@ syntax = "proto3";
 package super_send;
 import "google/protobuf/empty.proto";
 option go_package = ".;proto"; // 替换为您的实际包路径
+//配置
 message Conf{
-  int64 id =1;
-  string key=2;
-  string val=3;
+  int64 id =1;   //主键
+  string key=2;  //key
+  string val=3;  //值
 }
+//获取配置列表
 message GetConfListRequest{
-  string keywords = 1;  //关键字
+  string keywords = 1;  //搜索关键字
 }
+//配置列表响应
 message ConfListResponse{
-  repeated Conf data=3;
+  repeated Conf data=3;  //配置列表数组
   uint32 code=1; //状态码 0=失败,1=成功
   string message=2;//信息
-  int64 count=4;
+  int64 count=4;  //总条数
 }
+//设置配置请求
 message SetConfRequest{
-  int64 id=1;
-  string key=2;
-  string val=3;
+  int64 id=1;   //主键
+  string key=2;  //key
+  string val=3;  //值
 }
+//删除配置
 message DelConfRequest{
   int64 id=1;
 }
+//配置响应
 message ConfResponse{
   uint32 code=1; //状态码 0=失败,1=成功
   string message=2;//信息
 }
-
+//配置服务
 service ConfService {
+  //设置配置信息
   rpc SetConf(SetConfRequest) returns (ConfResponse){}
+  //删除配置信息
   rpc DelConf(DelConfRequest) returns (ConfResponse){}
+  //获取配置列表
   rpc GetConfList(GetConfListRequest) returns (ConfListResponse){}
+  //重新加载配置
   rpc Reload(google.protobuf.Empty) returns (ConfResponse){}
 }

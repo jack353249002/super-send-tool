@@ -33,12 +33,19 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SendServiceClient interface {
-	SetSend(ctx context.Context, in *AddSendRequest, opts ...grpc.CallOption) (*AddSendResponse, error)
+	// 设置发送规则
+	SetSend(ctx context.Context, in *AddSendRequest, opts ...grpc.CallOption) (*SendResponse, error)
+	// 获取发送规则详情
 	SendInfo(ctx context.Context, in *SendInfoRequest, opts ...grpc.CallOption) (*SendInfoResponse, error)
+	// 获取发送规则列表
 	GetSendInfoList(ctx context.Context, in *GetSendInfoListRequest, opts ...grpc.CallOption) (*GetSendInfoListResponse, error)
+	// 获取发送对象邮箱列表
 	GetSendList(ctx context.Context, in *GetSendListRequest, opts ...grpc.CallOption) (*GetSendListResponse, error)
+	// 发送规则控制
 	SendInfoAction(ctx context.Context, in *SendInfoActionRequest, opts ...grpc.CallOption) (*SendInfoActionResponse, error)
-	SetSendInfo(ctx context.Context, in *EditSendRequest, opts ...grpc.CallOption) (*AddSendResponse, error)
+	// 发送规则设置
+	SetSendInfo(ctx context.Context, in *EditSendRequest, opts ...grpc.CallOption) (*SendResponse, error)
+	// 获取发送规则smtp列表
 	GetSmtpServerList(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*SmtpServerResponse, error)
 }
 
@@ -50,8 +57,8 @@ func NewSendServiceClient(cc grpc.ClientConnInterface) SendServiceClient {
 	return &sendServiceClient{cc}
 }
 
-func (c *sendServiceClient) SetSend(ctx context.Context, in *AddSendRequest, opts ...grpc.CallOption) (*AddSendResponse, error) {
-	out := new(AddSendResponse)
+func (c *sendServiceClient) SetSend(ctx context.Context, in *AddSendRequest, opts ...grpc.CallOption) (*SendResponse, error) {
+	out := new(SendResponse)
 	err := c.cc.Invoke(ctx, SendService_SetSend_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -95,8 +102,8 @@ func (c *sendServiceClient) SendInfoAction(ctx context.Context, in *SendInfoActi
 	return out, nil
 }
 
-func (c *sendServiceClient) SetSendInfo(ctx context.Context, in *EditSendRequest, opts ...grpc.CallOption) (*AddSendResponse, error) {
-	out := new(AddSendResponse)
+func (c *sendServiceClient) SetSendInfo(ctx context.Context, in *EditSendRequest, opts ...grpc.CallOption) (*SendResponse, error) {
+	out := new(SendResponse)
 	err := c.cc.Invoke(ctx, SendService_SetSendInfo_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -117,12 +124,19 @@ func (c *sendServiceClient) GetSmtpServerList(ctx context.Context, in *empty.Emp
 // All implementations must embed UnimplementedSendServiceServer
 // for forward compatibility
 type SendServiceServer interface {
-	SetSend(context.Context, *AddSendRequest) (*AddSendResponse, error)
+	// 设置发送规则
+	SetSend(context.Context, *AddSendRequest) (*SendResponse, error)
+	// 获取发送规则详情
 	SendInfo(context.Context, *SendInfoRequest) (*SendInfoResponse, error)
+	// 获取发送规则列表
 	GetSendInfoList(context.Context, *GetSendInfoListRequest) (*GetSendInfoListResponse, error)
+	// 获取发送对象邮箱列表
 	GetSendList(context.Context, *GetSendListRequest) (*GetSendListResponse, error)
+	// 发送规则控制
 	SendInfoAction(context.Context, *SendInfoActionRequest) (*SendInfoActionResponse, error)
-	SetSendInfo(context.Context, *EditSendRequest) (*AddSendResponse, error)
+	// 发送规则设置
+	SetSendInfo(context.Context, *EditSendRequest) (*SendResponse, error)
+	// 获取发送规则smtp列表
 	GetSmtpServerList(context.Context, *empty.Empty) (*SmtpServerResponse, error)
 	mustEmbedUnimplementedSendServiceServer()
 }
@@ -131,7 +145,7 @@ type SendServiceServer interface {
 type UnimplementedSendServiceServer struct {
 }
 
-func (UnimplementedSendServiceServer) SetSend(context.Context, *AddSendRequest) (*AddSendResponse, error) {
+func (UnimplementedSendServiceServer) SetSend(context.Context, *AddSendRequest) (*SendResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetSend not implemented")
 }
 func (UnimplementedSendServiceServer) SendInfo(context.Context, *SendInfoRequest) (*SendInfoResponse, error) {
@@ -146,7 +160,7 @@ func (UnimplementedSendServiceServer) GetSendList(context.Context, *GetSendListR
 func (UnimplementedSendServiceServer) SendInfoAction(context.Context, *SendInfoActionRequest) (*SendInfoActionResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendInfoAction not implemented")
 }
-func (UnimplementedSendServiceServer) SetSendInfo(context.Context, *EditSendRequest) (*AddSendResponse, error) {
+func (UnimplementedSendServiceServer) SetSendInfo(context.Context, *EditSendRequest) (*SendResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetSendInfo not implemented")
 }
 func (UnimplementedSendServiceServer) GetSmtpServerList(context.Context, *empty.Empty) (*SmtpServerResponse, error) {

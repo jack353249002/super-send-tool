@@ -8,13 +8,15 @@ import (
 )
 
 type SuperSendConnInfo struct {
-	ID       int    `json:"id" gorm:"column:id"`
-	Address  string `json:"address" gorm:"column:address"`
-	IsSsl    int    `json:"is_ssl" gorm:"column:is_ssl"`
-	Username string `json:"username" gorm:"column:username"`
-	Password string `json:"password" gorm:"column:password"`
-	Online   uint8  `json:"online"`
-	Token    string `json:"token"`
+	ID                   int    `json:"id" gorm:"column:id"`
+	Address              string `json:"address" gorm:"column:address"`
+	IsSsl                int    `json:"is_ssl" gorm:"column:is_ssl"`
+	Username             string `json:"username" gorm:"column:username"`
+	Password             string `json:"password" gorm:"column:password"`
+	Online               uint8  `json:"online"`
+	Token                string `json:"token"`
+	RefreshTokenInterval int    `json:"refresh_token_interval"`
+	ConnLastLoginTime    int    `json:"conn_last_login_time"`
 }
 
 func (m *SuperSendConnInfo) TableName() string {

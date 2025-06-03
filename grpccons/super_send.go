@@ -4,8 +4,10 @@ import (
 	"context"
 	"crypto/tls"
 	"crypto/x509"
+	"fmt"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/keepalive"
 	"io/ioutil"
 	"super-send-tool/config/baseconfig"
 	"super-send-tool/db"
@@ -90,7 +92,7 @@ func (s *SuperSend) Init(id int, address string, userName, password string, isSS
 	s.Password = password
 	s.IsSSL = isSSL
 	var opts []grpc.DialOption
-	ctx, _ := context.WithTimeout(context.Background(), 35*time.Second)
+	ctx, _ := context.WithTimeout(context.Background(), 40*time.Second)
 	if s.IsSSL {
 		caCertPool := x509.NewCertPool()
 		for _, val := range baseconfig.CONFIG.CAPATHS {
@@ -112,7 +114,14 @@ func (s *SuperSend) Init(id int, address string, userName, password string, isSS
 		opts = append(opts, grpc.WithInsecure())
 	}
 	opts = append(opts, grpc.WithBlock())
+	kp := keepalive.ClientParameters{
+		Time:                10 * time.Second, // 每10秒ping一次
+		Timeout:             20 * time.Second, // 等待ack最多5秒
+		PermitWithoutStream: true,             // 即使没有活跃流也允许ping
+	}
+	opts = append(opts, grpc.WithKeepaliveParams(kp))
 	s.Conn, err = grpc.DialContext(ctx, address, opts...)
+	fmt.Println(err)
 	return
 }
 func (s *SuperSend) ReConnect() (err error) {

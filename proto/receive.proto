@@ -1,17 +1,17 @@
 syntax = "proto3";
 package super_send;
 option go_package = ".;proto"; // 替换为您的实际包路径
-message AddReceiveRequest{
-    string title = 1;
-    string receive_rule = 2;
-    string receive_server_id = 3;
-    int64 receive_model = 4;
-    int64 status = 5;
-    int64 end_type = 6;
-    string end_rule = 7;
-    int64 id = 8;
+//添加接收服务请求
+message SetReceiveRequest{
+    string title = 1;  //标题
+    string receive_rule = 2;  //接收规则
+    string receive_server_id = 3;   //imap id
+    int64 receive_model = 4;  //接收模型:固定=0
+    int64 status = 5;         //状态:添加默认0
+    int64 end_type = 6;       //结束类型:固定=0
+    string end_rule = 7;       //结束规则:目前空字符串
+    int64 id = 8;              //主键 添加传0
 }
-
 message GetReceiveRequest{
     string title = 1;
     string receive_rule = 2;
@@ -21,90 +21,109 @@ message GetReceiveRequest{
     int64 end_type = 6;
     string end_rule = 7;
 }
+//根据接收规则获取邮件消息列表
 message GetReceiveMessageListRequest{
-    int64 receive_id = 1;
+    int64 receive_id = 1; //接收规则id
 }
+//邮件列表
 message GetReceiveMessageList{
     int64  id=1;
-    string subject=2;
-    int64 imap_server_id=3;
-    string  sender_address=4;
-    string date=5;
-    string  message_id=6;
-    string imap_server_text=7;
-    uint32 status=8;
-    uint64 uid=9;
+    string subject=2;    //标题
+    int64 imap_server_id=3; //对应的Imap id
+    string  sender_address=4;  //发送者地址
+    string date=5;   //日期
+    string  message_id=6;   //消息id
+    string imap_server_text=7;  //imap_server 标题
+    uint32 status=8;   //状态 未启用
+    uint64 uid=9;      //邮件用户id
 }
+//获取消息列表响应
 message GetReceiveMessageListResponse{
     uint32 code=1; //状态码 0=失败,1=成功
     string message=2;//信息
-    repeated GetReceiveMessageList data=3;
-    int64 count=4;
+    repeated GetReceiveMessageList data=3;  //消息列表
+    int64 count=4;  //总条数
 }
-
+//获取邮件详情
 message GetReceiveMessageInfoRequest{
     int64 id=1;
-    uint64 uid=2;
-    int64 imap_server_id=3;
+    uint64 uid=2;   //消息列表中的uid
+    int64 imap_server_id=3;  //消息列表对应的Imap id
 }
+//文件信息
 message FileInfo{
-    bytes file_bytes=1;
-    string file_name=2;
+    bytes file_bytes=1;  //文件字节流
+    string file_name=2;  //文件名
 }
+//获取文件信息
 message GetReceiveMessageInfo{
     int64  id=1;
-    string subject=2;
-    int64 imap_server_id=3;
-    string  sender_address=4;
-    string date=5;
-    string  message_id=6;
-    string body=7;
-    repeated FileInfo files=8;
-    string imap_server_text=9;
+    string subject=2;      //标题
+    int64 imap_server_id=3;   //imap id
+    string  sender_address=4;   //发送者地址
+    string date=5;  //日期
+    string  message_id=6;   //消息id
+    string body=7;       //详情
+    repeated FileInfo files=8;   //附件数组
+    string imap_server_text=9;    //imap title
     uint32 status=10;
 }
+//获取邮件详情响应
 message GetReceiveMessageInfoResponse{
     uint32 code=1; //状态码 0=失败,1=成功
     string message=2;//信息
     GetReceiveMessageInfo data=3;
 }
-
-message AddReceiveRequestResponse{
+//添加接收规则响应
+message SetReceiveRequestResponse{
     uint32 code=1; //状态码 0=失败,1=成功
     string message=2;//信息
 }
+//启动接收规则
 message ReceiveActionRequest{
-    int64 receive_id = 1;
-    int64 status=2;
+    int64 receive_id = 1;  //接收规则id
+    int64 status=2;  //状态:1=启动,-1=停止,-2=暂停
 }
+//启动接收规则响应
 message ReceiveActionResponse{
     uint32 code=1; //状态码 0=失败,1=成功
     string message=2;//信息
 }
+//接收规则列表请求
 message ReceiveListRequest{
-    int64 page=1;
-    int64 limit=2;
-    int64 status=3;
+    int64 page=1;    //页数
+    int64 limit=2;   //每页条数
+    int64 status=3;   //状态:-1=全部,0=未开始,1=已开始,2=已结束
 }
+//接收规则列表
 message ReceiveList{
-    int64 id=1;
-    string title=2;
-    int64 createtime=3;
-    string receive_server_id=4;
-    uint64 status=5;
-    string receive_server_text=6;
+    int64 id=1;   //主键
+    string title=2;  //标题
+    int64 createtime=3;  //创建时间
+    string receive_server_id=4;  //imap id
+    uint64 status=5;     //状态:0=未开始,1=已开始,2=已结束
+    string receive_server_text=6;//imap title
+    string receive_rule=7;  //接收规则
 }
+//接收规则列表响应
 message GetReceiveListResponse{
     uint32 code=1; //状态码 0=失败,1=成功
     string message=2;//信息
-    repeated ReceiveList data=3;
-    int64 count=4;
+    repeated ReceiveList data=3;  //接收规则列表
+    int64 count=4;  //总条数
 }
+//接收规则服务
 service ReceiveService {
-    rpc AddReceive(AddReceiveRequest) returns (AddReceiveRequestResponse){}
+    //添加接收规则
+    rpc AddReceive(SetReceiveRequest) returns (SetReceiveRequestResponse){}
+    //获取接收邮件列表
     rpc GetReceiveMessages(GetReceiveMessageListRequest) returns (GetReceiveMessageListResponse){}
+    //获取接收邮件信息详情
     rpc GetReceiveMessageInfo(GetReceiveMessageInfoRequest) returns (GetReceiveMessageInfoResponse){}
+    //邮件接收器控制
     rpc ReceiveAction(ReceiveActionRequest) returns (ReceiveActionResponse){}
+    //获取邮件接收规则列表
     rpc GetReceiveList(ReceiveListRequest) returns (GetReceiveListResponse){}
-    rpc SetReceive(AddReceiveRequest) returns (AddReceiveRequestResponse){}
+    //设置接收规则
+    rpc SetReceive(SetReceiveRequest) returns (SetReceiveRequestResponse){}
 }

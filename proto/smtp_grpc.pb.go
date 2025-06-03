@@ -30,9 +30,13 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SmtpServiceClient interface {
-	SetSmtp(ctx context.Context, in *SetSmtpRequest, opts ...grpc.CallOption) (*SetSmtpResponse, error)
-	DelSmtp(ctx context.Context, in *DelSmtpRequest, opts ...grpc.CallOption) (*SetSmtpResponse, error)
+	// 设置smtp
+	SetSmtp(ctx context.Context, in *SetSmtpRequest, opts ...grpc.CallOption) (*SmtpResponse, error)
+	// 删除smtp
+	DelSmtp(ctx context.Context, in *DelSmtpRequest, opts ...grpc.CallOption) (*SmtpResponse, error)
+	// 获取smtp列表
 	GetSmtpList(ctx context.Context, in *GetSmtpListRequest, opts ...grpc.CallOption) (*SmtpServerListResponse, error)
+	// 重载smtp
 	Reload(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (SmtpService_ReloadClient, error)
 }
 
@@ -44,8 +48,8 @@ func NewSmtpServiceClient(cc grpc.ClientConnInterface) SmtpServiceClient {
 	return &smtpServiceClient{cc}
 }
 
-func (c *smtpServiceClient) SetSmtp(ctx context.Context, in *SetSmtpRequest, opts ...grpc.CallOption) (*SetSmtpResponse, error) {
-	out := new(SetSmtpResponse)
+func (c *smtpServiceClient) SetSmtp(ctx context.Context, in *SetSmtpRequest, opts ...grpc.CallOption) (*SmtpResponse, error) {
+	out := new(SmtpResponse)
 	err := c.cc.Invoke(ctx, SmtpService_SetSmtp_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -53,8 +57,8 @@ func (c *smtpServiceClient) SetSmtp(ctx context.Context, in *SetSmtpRequest, opt
 	return out, nil
 }
 
-func (c *smtpServiceClient) DelSmtp(ctx context.Context, in *DelSmtpRequest, opts ...grpc.CallOption) (*SetSmtpResponse, error) {
-	out := new(SetSmtpResponse)
+func (c *smtpServiceClient) DelSmtp(ctx context.Context, in *DelSmtpRequest, opts ...grpc.CallOption) (*SmtpResponse, error) {
+	out := new(SmtpResponse)
 	err := c.cc.Invoke(ctx, SmtpService_DelSmtp_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -87,7 +91,7 @@ func (c *smtpServiceClient) Reload(ctx context.Context, in *empty.Empty, opts ..
 }
 
 type SmtpService_ReloadClient interface {
-	Recv() (*SetSmtpResponse, error)
+	Recv() (*SmtpResponse, error)
 	grpc.ClientStream
 }
 
@@ -95,8 +99,8 @@ type smtpServiceReloadClient struct {
 	grpc.ClientStream
 }
 
-func (x *smtpServiceReloadClient) Recv() (*SetSmtpResponse, error) {
-	m := new(SetSmtpResponse)
+func (x *smtpServiceReloadClient) Recv() (*SmtpResponse, error) {
+	m := new(SmtpResponse)
 	if err := x.ClientStream.RecvMsg(m); err != nil {
 		return nil, err
 	}
@@ -107,9 +111,13 @@ func (x *smtpServiceReloadClient) Recv() (*SetSmtpResponse, error) {
 // All implementations must embed UnimplementedSmtpServiceServer
 // for forward compatibility
 type SmtpServiceServer interface {
-	SetSmtp(context.Context, *SetSmtpRequest) (*SetSmtpResponse, error)
-	DelSmtp(context.Context, *DelSmtpRequest) (*SetSmtpResponse, error)
+	// 设置smtp
+	SetSmtp(context.Context, *SetSmtpRequest) (*SmtpResponse, error)
+	// 删除smtp
+	DelSmtp(context.Context, *DelSmtpRequest) (*SmtpResponse, error)
+	// 获取smtp列表
 	GetSmtpList(context.Context, *GetSmtpListRequest) (*SmtpServerListResponse, error)
+	// 重载smtp
 	Reload(*empty.Empty, SmtpService_ReloadServer) error
 	mustEmbedUnimplementedSmtpServiceServer()
 }
@@ -118,10 +126,10 @@ type SmtpServiceServer interface {
 type UnimplementedSmtpServiceServer struct {
 }
 
-func (UnimplementedSmtpServiceServer) SetSmtp(context.Context, *SetSmtpRequest) (*SetSmtpResponse, error) {
+func (UnimplementedSmtpServiceServer) SetSmtp(context.Context, *SetSmtpRequest) (*SmtpResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetSmtp not implemented")
 }
-func (UnimplementedSmtpServiceServer) DelSmtp(context.Context, *DelSmtpRequest) (*SetSmtpResponse, error) {
+func (UnimplementedSmtpServiceServer) DelSmtp(context.Context, *DelSmtpRequest) (*SmtpResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method DelSmtp not implemented")
 }
 func (UnimplementedSmtpServiceServer) GetSmtpList(context.Context, *GetSmtpListRequest) (*SmtpServerListResponse, error) {
@@ -206,7 +214,7 @@ func _SmtpService_Reload_Handler(srv interface{}, stream grpc.ServerStream) erro
 }
 
 type SmtpService_ReloadServer interface {
-	Send(*SetSmtpResponse) error
+	Send(*SmtpResponse) error
 	grpc.ServerStream
 }
 
@@ -214,7 +222,7 @@ type smtpServiceReloadServer struct {
 	grpc.ServerStream
 }
 
-func (x *smtpServiceReloadServer) Send(m *SetSmtpResponse) error {
+func (x *smtpServiceReloadServer) Send(m *SmtpResponse) error {
 	return x.ServerStream.SendMsg(m)
 }
 

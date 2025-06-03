@@ -1,65 +1,74 @@
 syntax = "proto3";
 package super_send;
 option go_package = ".;proto"; // 替换为您的实际包路径
-
+//添加角色给用户
 message AddRoleForUserRequest{
-  string role=1;
-  string  username=2;
+  string role=1;   //角色
+  string  username=2;   //用户名
 }
+//删除用户角色
 message DelRoleForUserRequest{
-  string role=1;
-  string  username=2;
+  string role=1;   //角色
+  string  username=2; //用户名
 }
+//角色
 message Roles{
-  string role=1;
-  string  path=2;
+  string role=1;  //角色
+  string  path=2;  //访问地址  /api/v1/user  /api/*
   repeated string action=3;
 }
+//设置角色请求
 message RolesRequest{
-  string role=1;
-  string  path=2;
-  repeated string action=3;
+  string role=1; //角色
+  string  path=2;  //访问地址
+  repeated string action=3;  //操作类型，目前无用直接传 *号
 }
-
+//角色列表请求
 message RolesLisRequest {
-  string search_key = 1;
-  int64 page = 2;
-  int64 page_size = 3;
+  string search_key = 1;  //搜索key
+  int64 page = 2;         //页码
+  int64 page_size = 3;    //每页条数
 }
+//角色列表响应
 message RolesResponse {
   uint32 code=1; //状态码 0=失败,1=成功
   string message=2;//信息
 }
+//角色列表响应
 message RolesListResponse {
   uint32 code=1; //状态码 0=失败,1=成功
   string message=2;//信息
-  repeated Roles data = 3;
-  int64 total = 4;
+  repeated Roles data = 3;  //角色列表
+  int64 total = 4;   //总条数
 }
+//角色权限
 message RolesPermissions{
-  string role=1;
-  string  path=2;
-  string action=3;
+  string role=1;   //角色
+  string  path=2;  //访问地址
+  string action=3;  //操作
 }
+//删除角色权限
 message RolesPermissionsDelRequest{
-  repeated RolesPermissions roles=1;
+  repeated RolesPermissions roles=1; //权限列表
 }
+//删除角色
 message RoleDelRequest{
-  repeated RolesPermissions roles=1;
+  repeated RolesPermissions roles=1;    //RolesPermissions数组只需要传 role
 }
+//角色权限列表
 message RolesPermissionsListResponse {
-  repeated RolesPermissions data = 1;
-  int64 total = 2;
+  repeated RolesPermissions data = 1; //列表
+  int64 total = 2; //总条数
   uint32 code=3; //状态码 0=失败,1=成功
   string message=4;//信息
 }
-
+//角色服务
 service RolesService {
   rpc  Add(RolesRequest) returns (RolesResponse){}  //添加
   rpc  GetList(RolesLisRequest) returns (RolesListResponse){}   //获取列表
   rpc  GetRolesPermissions(RolesRequest) returns (RolesPermissionsListResponse){}  //获取权限
   rpc  DelRolesPermissions(RolesPermissionsDelRequest) returns (RolesResponse){} //删除权限
-  rpc  DelRole(RoleDelRequest) returns (RolesResponse){}
-  rpc  DelUserRole(DelRoleForUserRequest) returns (RolesResponse){}
+  rpc  DelRole(RoleDelRequest) returns (RolesResponse){} //删除角色
+  rpc  DelUserRole(DelRoleForUserRequest) returns (RolesResponse){} //删除用户角色
   rpc  AddRoleForUser(AddRoleForUserRequest) returns (RolesResponse){} //为用户添加角色
 }

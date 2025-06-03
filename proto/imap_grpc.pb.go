@@ -31,10 +31,15 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ImapServiceClient interface {
+	// 设置imap
 	SetImap(ctx context.Context, in *SetImapRequest, opts ...grpc.CallOption) (*SetImapResponse, error)
+	// 删除imap
 	DelImap(ctx context.Context, in *DelImapRequest, opts ...grpc.CallOption) (*SetImapResponse, error)
+	// 获取imap列表
 	GetImapList(ctx context.Context, in *GetImapListRequest, opts ...grpc.CallOption) (*ImapServerListResponse, error)
+	// 重载imap列表
 	Reload(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*SetImapResponse, error)
+	// 获取所有imap列表
 	GetImapAllList(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*ImapServerListResponse, error)
 }
 
@@ -95,10 +100,15 @@ func (c *imapServiceClient) GetImapAllList(ctx context.Context, in *empty.Empty,
 // All implementations must embed UnimplementedImapServiceServer
 // for forward compatibility
 type ImapServiceServer interface {
+	// 设置imap
 	SetImap(context.Context, *SetImapRequest) (*SetImapResponse, error)
+	// 删除imap
 	DelImap(context.Context, *DelImapRequest) (*SetImapResponse, error)
+	// 获取imap列表
 	GetImapList(context.Context, *GetImapListRequest) (*ImapServerListResponse, error)
+	// 重载imap列表
 	Reload(context.Context, *empty.Empty) (*SetImapResponse, error)
+	// 获取所有imap列表
 	GetImapAllList(context.Context, *empty.Empty) (*ImapServerListResponse, error)
 	mustEmbedUnimplementedImapServiceServer()
 }

@@ -31,12 +31,18 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ReceiveServiceClient interface {
-	AddReceive(ctx context.Context, in *AddReceiveRequest, opts ...grpc.CallOption) (*AddReceiveRequestResponse, error)
+	// 添加接收规则
+	AddReceive(ctx context.Context, in *SetReceiveRequest, opts ...grpc.CallOption) (*SetReceiveRequestResponse, error)
+	// 获取接收邮件列表
 	GetReceiveMessages(ctx context.Context, in *GetReceiveMessageListRequest, opts ...grpc.CallOption) (*GetReceiveMessageListResponse, error)
+	// 获取接收邮件信息详情
 	GetReceiveMessageInfo(ctx context.Context, in *GetReceiveMessageInfoRequest, opts ...grpc.CallOption) (*GetReceiveMessageInfoResponse, error)
+	// 邮件接收器控制
 	ReceiveAction(ctx context.Context, in *ReceiveActionRequest, opts ...grpc.CallOption) (*ReceiveActionResponse, error)
+	// 获取邮件接收规则列表
 	GetReceiveList(ctx context.Context, in *ReceiveListRequest, opts ...grpc.CallOption) (*GetReceiveListResponse, error)
-	SetReceive(ctx context.Context, in *AddReceiveRequest, opts ...grpc.CallOption) (*AddReceiveRequestResponse, error)
+	// 设置接收规则
+	SetReceive(ctx context.Context, in *SetReceiveRequest, opts ...grpc.CallOption) (*SetReceiveRequestResponse, error)
 }
 
 type receiveServiceClient struct {
@@ -47,8 +53,8 @@ func NewReceiveServiceClient(cc grpc.ClientConnInterface) ReceiveServiceClient {
 	return &receiveServiceClient{cc}
 }
 
-func (c *receiveServiceClient) AddReceive(ctx context.Context, in *AddReceiveRequest, opts ...grpc.CallOption) (*AddReceiveRequestResponse, error) {
-	out := new(AddReceiveRequestResponse)
+func (c *receiveServiceClient) AddReceive(ctx context.Context, in *SetReceiveRequest, opts ...grpc.CallOption) (*SetReceiveRequestResponse, error) {
+	out := new(SetReceiveRequestResponse)
 	err := c.cc.Invoke(ctx, ReceiveService_AddReceive_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -92,8 +98,8 @@ func (c *receiveServiceClient) GetReceiveList(ctx context.Context, in *ReceiveLi
 	return out, nil
 }
 
-func (c *receiveServiceClient) SetReceive(ctx context.Context, in *AddReceiveRequest, opts ...grpc.CallOption) (*AddReceiveRequestResponse, error) {
-	out := new(AddReceiveRequestResponse)
+func (c *receiveServiceClient) SetReceive(ctx context.Context, in *SetReceiveRequest, opts ...grpc.CallOption) (*SetReceiveRequestResponse, error) {
+	out := new(SetReceiveRequestResponse)
 	err := c.cc.Invoke(ctx, ReceiveService_SetReceive_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -105,12 +111,18 @@ func (c *receiveServiceClient) SetReceive(ctx context.Context, in *AddReceiveReq
 // All implementations must embed UnimplementedReceiveServiceServer
 // for forward compatibility
 type ReceiveServiceServer interface {
-	AddReceive(context.Context, *AddReceiveRequest) (*AddReceiveRequestResponse, error)
+	// 添加接收规则
+	AddReceive(context.Context, *SetReceiveRequest) (*SetReceiveRequestResponse, error)
+	// 获取接收邮件列表
 	GetReceiveMessages(context.Context, *GetReceiveMessageListRequest) (*GetReceiveMessageListResponse, error)
+	// 获取接收邮件信息详情
 	GetReceiveMessageInfo(context.Context, *GetReceiveMessageInfoRequest) (*GetReceiveMessageInfoResponse, error)
+	// 邮件接收器控制
 	ReceiveAction(context.Context, *ReceiveActionRequest) (*ReceiveActionResponse, error)
+	// 获取邮件接收规则列表
 	GetReceiveList(context.Context, *ReceiveListRequest) (*GetReceiveListResponse, error)
-	SetReceive(context.Context, *AddReceiveRequest) (*AddReceiveRequestResponse, error)
+	// 设置接收规则
+	SetReceive(context.Context, *SetReceiveRequest) (*SetReceiveRequestResponse, error)
 	mustEmbedUnimplementedReceiveServiceServer()
 }
 
@@ -118,7 +130,7 @@ type ReceiveServiceServer interface {
 type UnimplementedReceiveServiceServer struct {
 }
 
-func (UnimplementedReceiveServiceServer) AddReceive(context.Context, *AddReceiveRequest) (*AddReceiveRequestResponse, error) {
+func (UnimplementedReceiveServiceServer) AddReceive(context.Context, *SetReceiveRequest) (*SetReceiveRequestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method AddReceive not implemented")
 }
 func (UnimplementedReceiveServiceServer) GetReceiveMessages(context.Context, *GetReceiveMessageListRequest) (*GetReceiveMessageListResponse, error) {
@@ -133,7 +145,7 @@ func (UnimplementedReceiveServiceServer) ReceiveAction(context.Context, *Receive
 func (UnimplementedReceiveServiceServer) GetReceiveList(context.Context, *ReceiveListRequest) (*GetReceiveListResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetReceiveList not implemented")
 }
-func (UnimplementedReceiveServiceServer) SetReceive(context.Context, *AddReceiveRequest) (*AddReceiveRequestResponse, error) {
+func (UnimplementedReceiveServiceServer) SetReceive(context.Context, *SetReceiveRequest) (*SetReceiveRequestResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetReceive not implemented")
 }
 func (UnimplementedReceiveServiceServer) mustEmbedUnimplementedReceiveServiceServer() {}
@@ -150,7 +162,7 @@ func RegisterReceiveServiceServer(s grpc.ServiceRegistrar, srv ReceiveServiceSer
 }
 
 func _ReceiveService_AddReceive_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddReceiveRequest)
+	in := new(SetReceiveRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -162,7 +174,7 @@ func _ReceiveService_AddReceive_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: ReceiveService_AddReceive_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReceiveServiceServer).AddReceive(ctx, req.(*AddReceiveRequest))
+		return srv.(ReceiveServiceServer).AddReceive(ctx, req.(*SetReceiveRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -240,7 +252,7 @@ func _ReceiveService_GetReceiveList_Handler(srv interface{}, ctx context.Context
 }
 
 func _ReceiveService_SetReceive_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(AddReceiveRequest)
+	in := new(SetReceiveRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
@@ -252,7 +264,7 @@ func _ReceiveService_SetReceive_Handler(srv interface{}, ctx context.Context, de
 		FullMethod: ReceiveService_SetReceive_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(ReceiveServiceServer).SetReceive(ctx, req.(*AddReceiveRequest))
+		return srv.(ReceiveServiceServer).SetReceive(ctx, req.(*SetReceiveRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }

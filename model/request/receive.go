@@ -11,6 +11,9 @@ type ReceiveRequest struct {
 	EndRule            string `json:"end_rule"`          // 结束规则
 	LastNewMessageMark string `json:"last_new_message_mark"`
 }
+type ListenReceiveMessage struct {
+	IDs []int64 `json:"ids"`
+}
 type ReceiveListRequest struct {
 	PageListRequest
 	Status int8 `json:"status"`

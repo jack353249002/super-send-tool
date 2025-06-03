@@ -2,112 +2,131 @@ syntax = "proto3";
 package super_send;
 import "google/protobuf/empty.proto";
 option go_package = ".;proto"; // 替换为您的实际包路径
+//发送服务对象
 message SmtpServer{
-    int64 id=1;
-    string name=2;
-    string host=3;
-    int64 port=4;
+    int64 id=1;  //主键
+    string name=2;  //名字
+    string host=3;   //地址
+    int64 port=4;   //端口
 }
+//发送服务响应
 message SmtpServerResponse{
     repeated SmtpServer data=3;
     uint32 code=1; //状态码 0=失败,1=成功
     string message=2;//信息
-    int64 count=4;
+    int64 count=4; //总条数
 }
+//添加发送规则请求
 message AddSendRequest{
-    string title = 1;
-    int64 message_id = 2;
-    int64 createtime = 3;
-    uint32 send_model = 4;
-    string send_server_id = 5;
-    uint32 dispatch_model=6;
-    string receive = 7;
+    string title = 1;  //标题
+    int64 message_id = 2; //消息id
+    int64 createtime = 3;  //创建时间
+    uint32 send_model = 4;  //发送模型:0
+    string send_server_id = 5;  //smtp id组  例子:1,2
+    uint32 dispatch_model=6;  //0
+    string receive = 7;       //接收者邮箱号: 格式:email1,email2,email3
 }
+//编辑发送规则请求
 message EditSendRequest{
-    int64 id=8;
-    string title = 1;
-    int64 message_id = 2;
-    int64 createtime = 3;
-    uint32 send_model = 4;
-    string send_server_id = 5;
-    uint32 dispatch_model=6;
-    string receive = 7;
+    int64 id=8;  //主键
+    string title = 1;//标题
+    int64 message_id = 2; //消息Id
+    int64 createtime = 3;  //创建时间
+    uint32 send_model = 4;//发送模型:0
+    string send_server_id = 5;//smtp id组  例子:1,2
+    uint32 dispatch_model=6;//0
+    string receive = 7;//接收者邮箱号: 格式:email1,email2,email3
 }
+//发送规则详情请求
 message SendInfoRequest{
-    int64 send_id = 1;
+    int64 send_id = 1;  //发送规则 主键
 }
+//发送规则控制请求
 message SendInfoActionRequest{
-    int64 send_id = 1;
+    int64 send_id = 1;  //发送规则 主键
     int64 status=2;
 }
+//发送规则控制响应
 message SendInfoActionResponse{
     uint32 code=1; //状态码 0=失败,1=成功
     string message=2;//信息
 }
-message AddSendResponse{
+//发送规则响应
+message SendResponse{
     uint32 code=1; //状态码 0=失败,1=成功
     string message=2;//信息
 }
+//发送规则详情响应
 message SendInfoResponse{
     uint32 code=1; //状态码 0=失败,1=成功
     string message=2;//信息
 }
+//发送规则列表响应
 message GetSendInfoList{
-    int64 id=12;
-    string title = 1;
-    int64 message_id = 2;
-    int64 createtime = 3;
-    uint32 send_model = 4;
-    string send_server_id = 5;
-    uint32 dispatch_model=6;
-    string receive = 7;
-    uint32 status=8;
-    uint32 send_list_count=9;
-    uint32 success_count=10;
+    int64 id=12;   //主键
+    string title = 1; //标题
+    int64 message_id = 2;  //消息id
+    int64 createtime = 3;  //创建时间
+    uint32 send_model = 4;  //发送模型:0
+    string send_server_id = 5; //smtp id组  例子:1,2
+    uint32 dispatch_model=6;  //0
+    string receive = 7;   //接收者邮箱号: 格式:email1,email2,email3
+    uint32 status=8;      //状态:0=未开始,1=已开始,2=已结束
+    uint32 send_list_count=9; //发送总数
+    uint32 success_count=10; //发送成功数
     string message_title=11;//消息标题
     string send_server_text=13;//发送服务标题
 }
+//发送规则列表响应
 message GetSendInfoListResponse{
-    repeated GetSendInfoList data=3;
+    repeated GetSendInfoList data=3; //列表数组
     uint32 code=1; //状态码 0=失败,1=成功
     string message=2;//信息
     int64 count=4;
 }
+//获取发送规则列表请求
 message GetSendInfoListRequest{
-    int64 page=1;
-    int64 limit=2;
-    int64 status=3;
+    int64 page=1;  //页数
+    int64 limit=2; //每页条数
+    int64 status=3;  //状态 -1=全部 0=未开始,1=已开始,2=已结束
 }
-
+//发送对象邮件账号
 message GetSendList{
-    int64 id=5;
-    int64 send_id = 1;
-    string receive = 2;
-    int64 status = 3;
-    int64 send_server_id = 4;
-    string send_server_text=6;
+    int64 id=5;   //主键
+    int64 send_id = 1;  //发送规则 主键id
+    string receive = 2;  //接收者邮箱号:
+    int64 status = 3;    //状态:0=未发送,1=已发送
+    int64 send_server_id = 4;   //smtp id
+    string send_server_text=6;  //smtp title
 }
-
+//发送对象邮件账号响应
 message GetSendListResponse{
     repeated GetSendList data=3;
     uint32 code=1; //状态码 0=失败,1=成功
     string message=2;//信息
-    int64 count=4;
+    int64 count=4;  //总条数
 }
-
+//发送对象邮件列表请求
 message GetSendListRequest{
-    int64 page=1;
-    int64 limit=2;
-    int64 status=3;
-    int64 send_id = 4;
+    int64 page=1;  //页数
+    int64 limit=2;  //每页数量
+    int64 status=3; //状态:-1=全部 0=未发送,1=已发送
+    int64 send_id = 4;//发送规则 主键id
 }
 
 service SendService {
-    rpc SetSend(AddSendRequest) returns (AddSendResponse){}
+    //设置发送规则
+    rpc SetSend(AddSendRequest) returns (SendResponse){}
+    //获取发送规则详情
     rpc SendInfo(SendInfoRequest) returns (SendInfoResponse){}
+    //获取发送规则列表
     rpc GetSendInfoList(GetSendInfoListRequest) returns (GetSendInfoListResponse){}
+    //获取发送对象邮箱列表
     rpc GetSendList(GetSendListRequest) returns (GetSendListResponse){}
+    //发送规则控制
     rpc SendInfoAction(SendInfoActionRequest) returns (SendInfoActionResponse){}
-    rpc SetSendInfo(EditSendRequest) returns (AddSendResponse){}
+    //发送规则设置
+    rpc SetSendInfo(EditSendRequest) returns (SendResponse){}
+    //获取发送规则smtp列表
     rpc GetSmtpServerList(google.protobuf.Empty) returns (SmtpServerResponse){}
 }

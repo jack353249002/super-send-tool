@@ -2,46 +2,55 @@ syntax = "proto3";
 package super_send;
 import "google/protobuf/empty.proto";
 option go_package = ".;proto"; // 替换为您的实际包路径
+//smtp服务对象
 message SmtpServerObj{
-  int64 id=1;
-  string smtp_server=2;
-  string smtp_password=3;
-  string title=4;
-  string smtp_send_email=5;
-  int64 port=6;
-  int64  max_concurrency=7;
+  int64 id=1;  //主键
+  string smtp_server=2;   //smtp 服务器主机地址  如 smtp.163.com
+  string smtp_password=3;  //smtp 密码
+  string title=4;  //标题
+  string smtp_send_email=5;  //smtp  发送的邮箱
+  int64 port=6; //端口
+  int64  max_concurrency=7;  //最大并发数
 }
+//获取smtp列表请求
 message GetSmtpListRequest{
   string keywords = 1;  //关键字
-  int64 page=2;
-  int64 limit=3;
+  int64 page=2;   //页数
+  int64 limit=3;  //每页条数
 }
+//获取smtp列表响应
 message SmtpServerListResponse{
   repeated SmtpServerObj data=3;
   uint32 code=1; //状态码 0=失败,1=成功
   string message=2;//信息
   int64 count=4;
 }
+//设置smtp请求
 message SetSmtpRequest{
-  int64 id=1;
-  string smtp_server=2;
-  string smtp_password=3;
-  string title=4;
-  string smtp_send_email=5;
-  int64 port=6;
-  int64  max_concurrency=7;
+  int64 id=1;   //主键
+  string smtp_server=2; //smtp 服务器主机地址  如 smtp.163.com
+  string smtp_password=3;//smtp 密码
+  string title=4;//标题
+  string smtp_send_email=5; //smtp 发送的邮箱
+  int64 port=6;//端口
+  int64  max_concurrency=7; //最大并发数
 }
+//删除smtp请求
 message DelSmtpRequest{
-  int64 id=1;
+  int64 id=1;  //smtp 主键
 }
-message SetSmtpResponse{
+message SmtpResponse{
   uint32 code=1; //状态码 0=失败,1=成功
   string message=2;//信息
 }
 
 service SmtpService {
-  rpc SetSmtp(SetSmtpRequest) returns (SetSmtpResponse){}
-  rpc DelSmtp(DelSmtpRequest) returns (SetSmtpResponse){}
+  //设置smtp
+  rpc SetSmtp(SetSmtpRequest) returns (SmtpResponse){}
+  //删除smtp
+  rpc DelSmtp(DelSmtpRequest) returns (SmtpResponse){}
+  //获取smtp列表
   rpc GetSmtpList(GetSmtpListRequest) returns (SmtpServerListResponse){}
-  rpc Reload(google.protobuf.Empty) returns (stream SetSmtpResponse){}
+  //重载smtp
+  rpc Reload(google.protobuf.Empty) returns (stream SmtpResponse){}
 }

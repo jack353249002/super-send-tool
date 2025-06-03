@@ -8,17 +8,19 @@ type GetSuperSendInfoRequest struct {
 	ID int `json:"id" binding:"required"`
 }
 type AddSuperSendRequest struct {
-	Address  string `json:"address" binding:"required"`
-	IsSSL    uint8  `json:"is_ssl" binding:""`
-	UserName string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	Address              string `json:"address" binding:"required"`
+	IsSSL                uint8  `json:"is_ssl" binding:""`
+	UserName             string `json:"username" binding:"required"`
+	Password             string `json:"password" binding:"required"`
+	RefreshTokenInterval int    `json:"refresh_token_interval"`
 }
 type UpdateSuperSendRequest struct {
-	ID       int    `json:"id" binding:"required"`
-	Address  string `json:"address" binding:"required"`
-	IsSSL    uint8  `json:"is_ssl" binding:""`
-	UserName string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
+	ID                   int    `json:"id" binding:"required"`
+	Address              string `json:"address" binding:"required"`
+	IsSSL                uint8  `json:"is_ssl" binding:""`
+	UserName             string `json:"username" binding:"required"`
+	Password             string `json:"password" binding:"required"`
+	RefreshTokenInterval int    `json:"refresh_token_interval"`
 }
 type SetSuperSendOnlineRequest struct {
 	ID     int   `json:"id" binding:"required"`

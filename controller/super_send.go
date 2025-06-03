@@ -6,6 +6,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/metadata"
+	client2 "super-send-tool/client"
 	"super-send-tool/db"
 	"super-send-tool/grpccons"
 	"super-send-tool/model/dbmodel"
@@ -33,7 +34,7 @@ func SetSuperSendOnline(c *gin.Context) {
 	err = dao.Update(c, "id=@id", saveData, map[string]interface{}{"id": setSuperSendOnlineRequest.ID})
 	if err != nil {
 		if setSuperSendOnlineRequest.Online == 0 {
-			con := grpccons.SuperSendGroupAction.Get(c.GetInt("super_send_id"))
+			con := grpccons.SuperSendGroupAction.Get(setSuperSendOnlineRequest.ID)
 			if con == nil {
 				ResponseFailed(c, nil, "连接失败")
 				return
@@ -50,6 +51,15 @@ func SetSuperSendOnline(c *gin.Context) {
 		}
 		ResponseFailed(c, nil, err.Error())
 		return
+	} else {
+		if setSuperSendOnlineRequest.Online == 1 {
+			con := grpccons.SuperSendGroupAction.Get(setSuperSendOnlineRequest.ID)
+			var recoverClient client2.Client
+			recoverClient.Init(con)
+			go recoverClient.ListenMessage()
+			recoverClient.Login(con.UserName, con.Password)
+			client2.PublicClientPool.AddClient(setSuperSendOnlineRequest.ID, &recoverClient)
+		}
 	}
 	ResponseSuccess(c, nil, "success")
 	return
@@ -178,7 +188,7 @@ func AddSuperSend(c *gin.Context) {
 		return
 	}
 	dao := dbmodel.NewSuperSendConnInfoDao(c, db.Db)
-	err = dao.Create(c, &dbmodel.SuperSendConnInfo{Address: addSuperSendRequest.Address, IsSsl: int(addSuperSendRequest.IsSSL), Password: addSuperSendRequest.Password, Username: addSuperSendRequest.UserName})
+	err = dao.Create(c, &dbmodel.SuperSendConnInfo{Address: addSuperSendRequest.Address, IsSsl: int(addSuperSendRequest.IsSSL), Password: addSuperSendRequest.Password, Username: addSuperSendRequest.UserName, RefreshTokenInterval: addSuperSendRequest.RefreshTokenInterval})
 	if err != nil {
 		ResponseFailed(c, nil, err.Error())
 		return
@@ -199,7 +209,7 @@ func UpdateSuperSend(c *gin.Context) {
 		return
 	}
 	dao := dbmodel.NewSuperSendConnInfoDao(c, db.Db)
-	saveData := map[string]interface{}{"address": updateSuperSendRequest.Address, "is_ssl": updateSuperSendRequest.IsSSL, "password": updateSuperSendRequest.Password, "username": updateSuperSendRequest.UserName}
+	saveData := map[string]interface{}{"address": updateSuperSendRequest.Address, "is_ssl": updateSuperSendRequest.IsSSL, "password": updateSuperSendRequest.Password, "username": updateSuperSendRequest.UserName, "refresh_token_interval": updateSuperSendRequest.RefreshTokenInterval}
 	err = dao.Update(c, "id=@id", saveData, map[string]interface{}{"id": updateSuperSendRequest.ID})
 	if err != nil {
 		ResponseFailed(c, nil, err.Error())
@@ -251,7 +261,8 @@ func LoginSuperSend(c *gin.Context) {
 			return
 		} else {
 			if res.Code == 1 {
-				dao.Update(c, "id=@id", map[string]interface{}{"token": res.LoginResponse.Token}, map[string]interface{}{"id": c.GetInt("super_send_id")})
+				nowTime := time.Now().Unix()
+				dao.Update(c, "id=@id", map[string]interface{}{"token": res.LoginResponse.Token, "conn_last_login_time": nowTime}, map[string]interface{}{"id": c.GetInt("super_send_id")})
 				ResponseSuccess(c, res.LoginResponse.Token, res.Message)
 			} else {
 				ResponseFailed(c, nil, res.Message)

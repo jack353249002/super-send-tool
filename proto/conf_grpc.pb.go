@@ -30,9 +30,13 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ConfServiceClient interface {
+	// 设置配置信息
 	SetConf(ctx context.Context, in *SetConfRequest, opts ...grpc.CallOption) (*ConfResponse, error)
+	// 删除配置信息
 	DelConf(ctx context.Context, in *DelConfRequest, opts ...grpc.CallOption) (*ConfResponse, error)
+	// 获取配置列表
 	GetConfList(ctx context.Context, in *GetConfListRequest, opts ...grpc.CallOption) (*ConfListResponse, error)
+	// 重新加载配置
 	Reload(ctx context.Context, in *empty.Empty, opts ...grpc.CallOption) (*ConfResponse, error)
 }
 
@@ -84,9 +88,13 @@ func (c *confServiceClient) Reload(ctx context.Context, in *empty.Empty, opts ..
 // All implementations must embed UnimplementedConfServiceServer
 // for forward compatibility
 type ConfServiceServer interface {
+	// 设置配置信息
 	SetConf(context.Context, *SetConfRequest) (*ConfResponse, error)
+	// 删除配置信息
 	DelConf(context.Context, *DelConfRequest) (*ConfResponse, error)
+	// 获取配置列表
 	GetConfList(context.Context, *GetConfListRequest) (*ConfListResponse, error)
+	// 重新加载配置
 	Reload(context.Context, *empty.Empty) (*ConfResponse, error)
 	mustEmbedUnimplementedConfServiceServer()
 }
