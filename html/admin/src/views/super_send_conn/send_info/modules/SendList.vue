@@ -149,12 +149,13 @@ export default {
         console.log('nowSendInfo changed:', newVal)
         this.$refs.table.refresh(true)
       },
-      deep: true, // 深度监听
-      immediate: true // 立即触发一次监听器
+      deep: true // 深度监听
     },
     sendID: {
       handler (newVal, oldVal) {
-        this.reloadList()
+        if (newVal !== 0) {
+          this.reloadList()
+        }
       },
       deep: true
     }
@@ -171,7 +172,7 @@ export default {
       queryParam: { 'keyWords': '', 'status': '-1' },
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-        if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0) {
+        if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
           const requestParameters = Object.assign({}, parameter, this.queryParam)
           requestParameters.send_id = this.sendID
           console.log('loadData request parameters:', requestParameters)

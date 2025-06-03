@@ -42,8 +42,8 @@
       <span slot="created_at" slot-scope="text">
         {{ text | timestampToString }}
       </span>
-      <span slot="is_ssl" slot-scope="text">
-        <a-badge :status="text | isSSLTypeFilter" :text="text | isSSLFilter" />
+      <span slot="statusBox" slot-scope="text">
+        <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
       </span>
       <span slot="description" slot-scope="text">
         <ellipsis :length="4" tooltip>{{ text }}</ellipsis>
@@ -52,7 +52,7 @@
       <span slot="action" slot-scope="text, record">
         <template>
           <a-divider type="vertical" />
-          <a @click="handleEdit(record)">配置</a>
+          <a @click="handleEdit(record)">编辑</a>
           <a-divider type="vertical" />
           <a-popconfirm
             title="确定要删除此记录吗？"
@@ -67,7 +67,6 @@
     </s-table>
     <create-form
       ref="createModal"
-      :quillEditor="quillEditor"
       :selectSendInfo="selectSendInfo"
       :visible="visible"
       :loading="confirmLoading"
@@ -75,22 +74,41 @@
       @cancel="handleCancel"
       @ok="handleOk"
     />
+    <reload
+      ref="reloadModal"
+      :selectSendInfo="selectSendInfo"
+      :visible="reloadVisible"
+      :loading="confirmLoading"
+      @ok="reloadHandleCancel"
+      @cancel="reloadHandleCancel"
+    />
+    <send-list
+      ref="sendListModal"
+      :selectSendInfo="selectSendInfo"
+      :visible="sendListvisible"
+      :loading="sendListConfirmLoading"
+      :sendID="sendID"
+      @cancel="handleSendListCancel"
+    />
     <step-by-step-modal ref="modal" @ok="handleOk"/>
   </a-card>
 </template>
 
 <script>
 import { STable } from '@/components'
-import dayjs from 'dayjs'
 import {
- delMessage, getMessageList, RequestConFactory, setMessage, setSuperSendOnline
+  delImapServerCon,
+  getImapServerCon,
+  RequestConFactory, sendInfoActionCon, setImapServerCon,
+  setSuperSendOnline
 } from '@/api/super_send'
 import CreateForm from './modules/CreateForm'
 import { UPDATE_MENU_TYPE } from '@/store/mutation-types'
 import VueDraggableResizable from 'vue-draggable-resizable'
 import 'vue-draggable-resizable/dist/VueDraggableResizable.css'
 import { mapState } from 'vuex'
-
+import SendList from '@/views/super_send_conn/send_info/modules/SendList.vue'
+import Reload from '@/views/super_send_conn/smtp/modules/Reload.vue'
 // import router from '@/router'
 // import store from '@/store'
 const columns = [
@@ -99,38 +117,61 @@ const columns = [
     dataIndex: 'id'
   },
   {
+    title: 'imap服务器地址',
+    dataIndex: 'imap_server'
+  },
+  {
+    title: 'imap密码',
+    dataIndex: 'imap_password'
+  },
+  {
     title: '标题',
     dataIndex: 'title'
   },
   {
-    title: '创建时间',
-    dataIndex: 'createtime',
-    customRender: (text) => {
-      return dayjs(text * 1000).format('YYYY-MM-DD HH:mm:ss')
-    }
+    title: 'imap邮箱账号',
+    dataIndex: 'imap_email'
+  },
+  {
+    title: '端口',
+    dataIndex: 'port'
+  },
+  {
+    title: '最大连接数',
+    dataIndex: 'max_client'
   },
   {
     title: '操作',
     dataIndex: 'action',
-    width: '150px',
+    width: '250px',
     scopedSlots: { customRender: 'action' }
   }
 ]
 
-const isSSLMap = {
+const statusMap = {
   0: {
-    status: 'default',
-    text: '否'
+    status: 'default', // 或者 'not_started'
+    text: '未开始'
   },
   1: {
-    status: 'success',
-    text: '是'
+    status: 'default',
+    text: '进行中'
+  },
+  2: {
+    status: 'default',
+    text: '已结束'
+  },
+  3: {
+    status: 'default',
+    text: '暂停'
   }
 }
 
 export default {
   name: 'TableList',
   components: {
+    Reload,
+    SendList,
     STable,
     CreateForm,
     VueDraggableResizable
@@ -143,14 +184,17 @@ export default {
         this.$refs.table.refresh(true)
       },
       deep: true // 深度监听
-      // immediate: true 立即触发一次监听器
     }
   },
   data () {
     this.columns = columns
     return {
+      sendID: 0,
       // create model
       visible: false,
+      reloadVisible: false,
+      sendListvisible: false,
+      sendListConfirmLoading: false,
       confirmLoading: false,
       mdl: null,
       // 高级搜索 展开/关闭
@@ -162,9 +206,9 @@ export default {
          if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
           const requestParameters = Object.assign({}, parameter, this.queryParam)
           console.log('loadData request parameters:', requestParameters)
-          console.log('loadData', this.selectSendInfo)
+          console.log(this.selectSendInfo)
           const con = RequestConFactory(this.selectSendInfo)
-          return getMessageList(con, requestParameters)
+          return getImapServerCon(con, requestParameters)
             .then(res => {
               if (res.status === 200) {
                 if (res.result.data !== null) {
@@ -188,15 +232,22 @@ export default {
     }
   },
   filters: {
-    isSSLFilter (type) {
-      return isSSLMap[type].text
+    statusFilter (type) {
+      if (type === undefined || type === null || type === '') {
+        return statusMap[0].text
+      } else {
+        return statusMap[type].text
+      }
     },
-    isSSLTypeFilter (type) {
-      return isSSLMap[type].status
+    statusTypeFilter (type) {
+      if (type === undefined || type === null || type === '') {
+        return statusMap[0].status
+      } else {
+        return statusMap[type].status
+      }
     }
   },
   created () {
-    console.log('created')
     // getRoleList({ t: new Date() })
   },
   computed: {
@@ -211,6 +262,21 @@ export default {
     }
   },
   methods: {
+    sendInfoAction (record, value) {
+      // 更新记录中的选项值
+     const sendId = record.id
+     const status = Number(value)
+      if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0) {
+        const con = RequestConFactory(this.selectSendInfo)
+        sendInfoActionCon(con, { 'send_id': sendId, 'status': status }).then(res => {
+          if (res.status === 200) {
+            this.$message.success(res.message)
+          } else {
+            this.$message.error(res.message)
+          }
+        })
+      }
+    },
     updateMenu () {
       this.$store.commit(UPDATE_MENU_TYPE)
     },
@@ -233,12 +299,20 @@ export default {
       console.log('record', record)
       this.visible = true
       this.mdl = { ...record }
-      console.log('mdl', this.mdl)
+      console.log('record2', this.mdl)
+    },
+    sendListShow (record) {
+      this.sendID = record.id
+      this.sendListvisible = true
+    },
+    handleSendListCancel () {
+      this.sendID = 0
+      this.sendListvisible = false
     },
     handleDelete (id) {
-      if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
+      if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0) {
         const con = RequestConFactory(this.selectSendInfo)
-        delMessage(con, id).then(res => {
+        delImapServerCon(con, id).then(res => {
           if (res.status === 200) {
             this.$refs.table.refresh()
             this.$message.success(res.message)
@@ -246,38 +320,20 @@ export default {
             this.$message.error(res.message)
           }
         })
+      } else {
+        this.$message.error('请重新登录')
       }
     },
     handleOk () {
-      const formData = this.$refs.createModal.getFormData()
-      console.log('表单数据', formData)
       const form = this.$refs.createModal.form
       this.confirmLoading = true
       form.validateFields((errors, values) => {
         if (!errors) {
           console.log('values', values)
-          if (values.id > 0) {
             // 修改 e.g.
-            setMessage(values).then(res => {
-              if (res.status === 200) {
-                this.visible = false
-                this.confirmLoading = false
-                // 重置表单数据
-                form.resetFields()
-                // 刷新表格
-                this.$refs.table.refresh()
-
-                this.$message.success(res.message)
-              } else {
-                this.confirmLoading = false
-                this.$message.error(res.message)
-              }
-            })
-          } else {
             if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
               const con = RequestConFactory(this.selectSendInfo)
-              // 新增
-              setMessage(con, formData).then(res => {
+              setImapServerCon(con, values).then(res => {
                 if (res.status === 200) {
                   this.visible = false
                   this.confirmLoading = false
@@ -293,11 +349,17 @@ export default {
                 }
               })
             }
-          }
         } else {
           this.confirmLoading = false
         }
       })
+    },
+    showReload () {
+      this.reloadVisible = true
+      this.$refs.reloadModal.ReloadStart('')
+    },
+    reloadHandleCancel () {
+      this.reloadVisible = false
     },
     handleCancel () {
       this.visible = false

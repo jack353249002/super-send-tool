@@ -28,9 +28,6 @@
         <a-form-item label="密码">
           <a-input-password v-decorator="['password', {rules: [{required: true, message: '请输入密码'}]}]" />
         </a-form-item>
-        <a-form-item label="token刷新间隔">
-          <a-input v-decorator="['refresh_token_interval', {rules: [{required: false, message: '刷新token间隔'}]}]" />
-        </a-form-item>
       </a-form>
     </a-spin>
   </a-modal>
@@ -40,7 +37,7 @@
 import pick from 'lodash.pick'
 
 // 表单字段
-const fields = ['address', 'is_ssl', 'username', 'password', 'id', 'refresh_token_interval']
+const fields = ['address', 'is_ssl', 'username', 'password', 'id']
 
 export default {
   props: {

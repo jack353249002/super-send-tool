@@ -8,6 +8,15 @@
               <a-input v-model="queryParam.keyWords" placeholder=""/>
             </a-form-item>
           </a-col>
+          <a-col :md="8" :sm="24">
+            <a-form-item label="ssl状态">
+              <a-select v-model="queryParam.is_ssl" placeholder="请选择" default-value="-1">
+                <a-select-option value="-1">全部</a-select-option>
+                <a-select-option value="0">禁用</a-select-option>
+                <a-select-option value="1">启用</a-select-option>
+              </a-select>
+            </a-form-item>
+          </a-col>
           <a-col :md="!advanced && 8 || 24" :sm="24">
             <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
               <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
@@ -39,9 +48,6 @@
       <span slot="serial" slot-scope="text, record, index">
         {{ index + 1 }}
       </span>
-      <span slot="created_at" slot-scope="text">
-        {{ text | timestampToString }}
-      </span>
       <span slot="is_ssl" slot-scope="text">
         <a-badge :status="text | isSSLTypeFilter" :text="text | isSSLFilter" />
       </span>
@@ -51,8 +57,11 @@
 
       <span slot="action" slot-scope="text, record">
         <template>
+          <a @click="handleOnline(record.id, record.online === 1 ? 0 : 1)">{{ record.online === 1 ? '关闭连接' : '连接' }}</a>
           <a-divider type="vertical" />
           <a @click="handleEdit(record)">配置</a>
+          <a-divider type="vertical" />
+          <a @click="handleRegister(record)">注册</a>
           <a-divider type="vertical" />
           <a-popconfirm
             title="确定要删除此记录吗？"
@@ -67,8 +76,6 @@
     </s-table>
     <create-form
       ref="createModal"
-      :quillEditor="quillEditor"
-      :selectSendInfo="selectSendInfo"
       :visible="visible"
       :loading="confirmLoading"
       :model="mdl"
@@ -81,16 +88,16 @@
 
 <script>
 import { STable } from '@/components'
-import dayjs from 'dayjs'
 import {
- delMessage, getMessageList, RequestConFactory, setMessage, setSuperSendOnline
+  addSuperSend,
+  deleteSuperSend,
+  login, register,
+  setSuperSendOnline,
+  updateSuperSend
 } from '@/api/super_send'
 import CreateForm from './modules/CreateForm'
 import { UPDATE_MENU_TYPE } from '@/store/mutation-types'
-import VueDraggableResizable from 'vue-draggable-resizable'
-import 'vue-draggable-resizable/dist/VueDraggableResizable.css'
-import { mapState } from 'vuex'
-
+import { getEtcdBridgeList } from '@/api/etcd_bridge'
 // import router from '@/router'
 // import store from '@/store'
 const columns = [
@@ -99,15 +106,21 @@ const columns = [
     dataIndex: 'id'
   },
   {
-    title: '标题',
-    dataIndex: 'title'
+    title: '地址',
+    dataIndex: 'address'
   },
   {
-    title: '创建时间',
-    dataIndex: 'createtime',
-    customRender: (text) => {
-      return dayjs(text * 1000).format('YYYY-MM-DD HH:mm:ss')
-    }
+    title: '是否开启ssl',
+    dataIndex: 'is_ssl',
+    scopedSlots: { customRender: 'is_ssl' }
+  },
+  {
+    title: '用户名',
+    dataIndex: 'username'
+  },
+  {
+    title: '密码',
+    dataIndex: 'password'
   },
   {
     title: '操作',
@@ -132,19 +145,7 @@ export default {
   name: 'TableList',
   components: {
     STable,
-    CreateForm,
-    VueDraggableResizable
-  },
-  watch: {
-    nowSendInfo: {
-      handler (newVal, oldVal) {
-        this.selectSendInfo = newVal
-        console.log('nowSendInfo changed:', newVal)
-        this.$refs.table.refresh(true)
-      },
-      deep: true // 深度监听
-      // immediate: true 立即触发一次监听器
-    }
+    CreateForm
   },
   data () {
     this.columns = columns
@@ -156,35 +157,18 @@ export default {
       // 高级搜索 展开/关闭
       advanced: false,
       // 查询参数
-      queryParam: { 'keyWords': '' },
+      queryParam: { 'keyWords': '', 'is_ssl': '-1' },
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-         if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
-          const requestParameters = Object.assign({}, parameter, this.queryParam)
-          console.log('loadData request parameters:', requestParameters)
-          console.log('loadData', this.selectSendInfo)
-          const con = RequestConFactory(this.selectSendInfo)
-          return getMessageList(con, requestParameters)
-            .then(res => {
-              if (res.status === 200) {
-                if (res.result.data !== null) {
-                  return res.result
-                } else {
-                  return Promise.resolve({ data: [], total: 0 })
-                }
-              } else if (res.status === 401) {
-                return Promise.resolve({ data: [], total: 0 })
-              } else {
-                return Promise.resolve({ data: [], total: 0 })
-              }
-            })
-        } else {
-           return Promise.resolve({ data: [], total: 0 })
-        }
+        const requestParameters = Object.assign({}, parameter, this.queryParam)
+        console.log('loadData request parameters:', requestParameters)
+        return getEtcdBridgeList(requestParameters)
+          .then(res => {
+            return res.result
+          })
       },
       selectedRowKeys: [],
-      selectedRows: [],
-      selectSendInfo: {}
+      selectedRows: []
     }
   },
   filters: {
@@ -196,13 +180,9 @@ export default {
     }
   },
   created () {
-    console.log('created')
     // getRoleList({ t: new Date() })
   },
   computed: {
-    ...mapState({
-      nowSendInfo: state => state.app.nowSendInfo
-    }),
     rowSelection () {
       return {
         selectedRowKeys: this.selectedRowKeys,
@@ -214,9 +194,27 @@ export default {
     updateMenu () {
       this.$store.commit(UPDATE_MENU_TYPE)
     },
+    handleRegister (record) {
+      register(record.token, record.id, record).then(res => {
+          if (res.status === 200) {
+            this.$message.success(res.message)
+          } else {
+            this.$message.error(res.message)
+          }
+      })
+    },
     handleOnline (id, online) {
       setSuperSendOnline(id, online).then(res => {
         if (res.status === 200) {
+          if (online === 1) {
+            login(id).then(res => {
+              if (res.status === 200) {
+                this.$message.success(res.message)
+              } else {
+                this.$message.error(res.message)
+              }
+            })
+          }
           this.$refs.table.refresh()
           this.updateMenu()
           this.$message.success(res.message)
@@ -230,27 +228,21 @@ export default {
       this.visible = true
     },
     handleEdit (record) {
-      console.log('record', record)
       this.visible = true
+      record.is_ssl = record.is_ssl.toString()
       this.mdl = { ...record }
-      console.log('mdl', this.mdl)
     },
     handleDelete (id) {
-      if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
-        const con = RequestConFactory(this.selectSendInfo)
-        delMessage(con, id).then(res => {
-          if (res.status === 200) {
-            this.$refs.table.refresh()
-            this.$message.success(res.message)
-          } else {
-            this.$message.error(res.message)
-          }
-        })
-      }
+      deleteSuperSend(id).then(res => {
+        if (res.status === 200) {
+          this.$refs.table.refresh()
+          this.$message.success(res.message)
+        } else {
+          this.$message.error(res.message)
+        }
+      })
     },
     handleOk () {
-      const formData = this.$refs.createModal.getFormData()
-      console.log('表单数据', formData)
       const form = this.$refs.createModal.form
       this.confirmLoading = true
       form.validateFields((errors, values) => {
@@ -258,7 +250,7 @@ export default {
           console.log('values', values)
           if (values.id > 0) {
             // 修改 e.g.
-            setMessage(values).then(res => {
+            updateSuperSend(values).then(res => {
               if (res.status === 200) {
                 this.visible = false
                 this.confirmLoading = false
@@ -269,30 +261,25 @@ export default {
 
                 this.$message.success(res.message)
               } else {
-                this.confirmLoading = false
                 this.$message.error(res.message)
               }
             })
           } else {
-            if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
-              const con = RequestConFactory(this.selectSendInfo)
-              // 新增
-              setMessage(con, formData).then(res => {
-                if (res.status === 200) {
-                  this.visible = false
-                  this.confirmLoading = false
-                  // 重置表单数据
-                  form.resetFields()
-                  // 刷新表格
-                  this.$refs.table.refresh()
+            // 新增
+             addSuperSend(values).then(res => {
+               if (res.status === 200) {
+                 this.visible = false
+                 this.confirmLoading = false
+                 // 重置表单数据
+                 form.resetFields()
+                 // 刷新表格
+                 this.$refs.table.refresh()
 
-                  this.$message.success(res.message)
-                } else {
-                  this.confirmLoading = false
-                  this.$message.error(res.message)
-                }
-              })
-            }
+                 this.$message.success(res.message)
+               } else {
+                 this.$message.error(res.message)
+               }
+            })
           }
         } else {
           this.confirmLoading = false
@@ -327,9 +314,3 @@ export default {
   }
 }
 </script>
-<style scoped>
-.draggable-box {
-  border: 2px solid red;  /* 添加边框 */
-  border-radius: 5px;       /* 可选：设置圆角 */
-}
-</style>

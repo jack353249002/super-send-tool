@@ -4,8 +4,17 @@
       <a-form layout="inline">
         <a-row :gutter="48">
           <a-col :md="8" :sm="24">
-            <a-form-item label="关键词">
+            <!--            <a-form-item label="关键词">
               <a-input v-model="queryParam.keyWords" placeholder=""/>
+            </a-form-item>-->
+            <a-form-item label="状态">
+              <a-select v-model="queryParam.status" placeholder="请选择" default-value="-1">
+                <a-select-option value="-1">全部</a-select-option>
+                <a-select-option value="0">未开始</a-select-option>
+                <a-select-option value="1">进行中</a-select-option>
+                <a-select-option value="2">已结束</a-select-option>
+                <a-select-option value="3">暂停</a-select-option>
+              </a-select>
             </a-form-item>
           </a-col>
           <a-col :md="!advanced && 8 || 24" :sm="24">
@@ -42,8 +51,11 @@
       <span slot="created_at" slot-scope="text">
         {{ text | timestampToString }}
       </span>
-      <span slot="is_ssl" slot-scope="text">
-        <a-badge :status="text | isSSLTypeFilter" :text="text | isSSLFilter" />
+      <span slot="statusBox" slot-scope="text">
+        <a-badge :status="text | statusTypeFilter" :text="text | statusFilter" />
+      </span>
+      <span slot="endTypeBox" slot-scope="text">
+        <a-badge :status="text | endTypeTypeFilter" :text="text | endTypeFilter" />
       </span>
       <span slot="description" slot-scope="text">
         <ellipsis :length="4" tooltip>{{ text }}</ellipsis>
@@ -54,26 +66,36 @@
           <a-divider type="vertical" />
           <a @click="handleEdit(record)">配置</a>
           <a-divider type="vertical" />
-          <a-popconfirm
-            title="确定要删除此记录吗？"
-            ok-text="确定"
-            cancel-text="取消"
-            @confirm="handleDelete(record.id)"
+          <a @click="receiveMessageListShow(record)">消息列表</a>
+          <a-divider type="vertical" />
+          <a-select
+            :value="record.selectedActionStatus"
+            @change="sendInfoAction(record, $event)"
           >
-            <a-button type="link" danger>删除</a-button>
-          </a-popconfirm>
+            <a-select-option value="-1">停止</a-select-option>
+            <a-select-option value="1">启动</a-select-option>
+            <a-select-option value="-2">暂停</a-select-option>
+            <!-- 添加更多选项 -->
+          </a-select>
         </template>
       </span>
     </s-table>
     <create-form
       ref="createModal"
-      :quillEditor="quillEditor"
       :selectSendInfo="selectSendInfo"
       :visible="visible"
       :loading="confirmLoading"
       :model="mdl"
       @cancel="handleCancel"
       @ok="handleOk"
+    />
+    <receive-messages-list
+      ref="ReceiveMessagesModal"
+      :selectSendInfo="selectSendInfo"
+      :visible="receiveMessageListVisible"
+      :loading="receiveMessageConfirmLoading"
+      :receiveID="receiveID"
+      @cancel="receiveMessageListCancel"
     />
     <step-by-step-modal ref="modal" @ok="handleOk"/>
   </a-card>
@@ -83,14 +105,17 @@
 import { STable } from '@/components'
 import dayjs from 'dayjs'
 import {
- delMessage, getMessageList, RequestConFactory, setMessage, setSuperSendOnline
+  addReceive,
+  deleteSuperSend, getReceiveList, receiveActionCon,
+  RequestConFactory, setReceiveCon,
+  setSuperSendOnline
 } from '@/api/super_send'
 import CreateForm from './modules/CreateForm'
 import { UPDATE_MENU_TYPE } from '@/store/mutation-types'
 import VueDraggableResizable from 'vue-draggable-resizable'
 import 'vue-draggable-resizable/dist/VueDraggableResizable.css'
 import { mapState } from 'vuex'
-
+import ReceiveMessagesList from './modules/ReceiveMessagesList.vue'
 // import router from '@/router'
 // import store from '@/store'
 const columns = [
@@ -103,6 +128,24 @@ const columns = [
     dataIndex: 'title'
   },
   {
+    title: '发送服务器标题',
+    dataIndex: 'receive_server_text'
+  },
+  {
+    title: '接收规则',
+    dataIndex: 'receive_rule'
+  },
+  {
+    title: '状态',
+    dataIndex: 'status',
+    scopedSlots: { customRender: 'statusBox' }
+  },
+  {
+    title: '结束类型',
+    dataIndex: 'end_type',
+    scopedSlots: { customRender: 'endTypeBox' }
+  },
+  {
     title: '创建时间',
     dataIndex: 'createtime',
     customRender: (text) => {
@@ -112,25 +155,43 @@ const columns = [
   {
     title: '操作',
     dataIndex: 'action',
-    width: '150px',
+    width: '250px',
     scopedSlots: { customRender: 'action' }
   }
 ]
 
-const isSSLMap = {
+const statusMap = {
   0: {
-    status: 'default',
-    text: '否'
+    status: 'default', // 或者 'not_started'
+    text: '未开始'
   },
   1: {
-    status: 'success',
-    text: '是'
+    status: 'default',
+    text: '进行中'
+  },
+  2: {
+    status: 'default',
+    text: '已结束'
+  },
+  3: {
+    status: 'default',
+    text: '暂停'
   }
 }
-
+const endTypeMap = {
+  0: {
+    status: 'default', // 或者 'not_started'
+    text: '永久运行'
+  },
+  1: {
+    status: 'default',
+    text: '自动结束'
+  }
+}
 export default {
   name: 'TableList',
   components: {
+    ReceiveMessagesList,
     STable,
     CreateForm,
     VueDraggableResizable
@@ -143,31 +204,47 @@ export default {
         this.$refs.table.refresh(true)
       },
       deep: true // 深度监听
-      // immediate: true 立即触发一次监听器
     }
   },
   data () {
     this.columns = columns
     return {
+      receiveID: 0,
       // create model
       visible: false,
+      receiveMessageListVisible: false,
+      receiveMessageConfirmLoading: false,
       confirmLoading: false,
       mdl: null,
       // 高级搜索 展开/关闭
       advanced: false,
       // 查询参数
-      queryParam: { 'keyWords': '' },
+      queryParam: { 'keyWords': '', 'status': null },
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
          if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
           const requestParameters = Object.assign({}, parameter, this.queryParam)
           console.log('loadData request parameters:', requestParameters)
-          console.log('loadData', this.selectSendInfo)
+          console.log(this.selectSendInfo)
           const con = RequestConFactory(this.selectSendInfo)
-          return getMessageList(con, requestParameters)
+          return getReceiveList(con, requestParameters)
             .then(res => {
               if (res.status === 200) {
                 if (res.result.data !== null) {
+                  res.result.data.forEach(item => {
+                    if (item.status == null) {
+                      item.status = 0
+                    }
+                    if (item.status === 0 || item.status === 2) {
+                      item.selectedActionStatus = '-1'
+                    }
+                    if (item.status === 1) {
+                      item.selectedActionStatus = '1'
+                    }
+                    if (item.status === 3) {
+                      item.selectedActionStatus = '-2'
+                    }
+                  })
                   return res.result
                 } else {
                   return Promise.resolve({ data: [], total: 0 })
@@ -188,15 +265,36 @@ export default {
     }
   },
   filters: {
-    isSSLFilter (type) {
-      return isSSLMap[type].text
+    statusFilter (type) {
+      if (type === undefined || type === null || type === '') {
+        return statusMap[0].text
+      } else {
+        return statusMap[type].text
+      }
     },
-    isSSLTypeFilter (type) {
-      return isSSLMap[type].status
+    statusTypeFilter (type) {
+      if (type === undefined || type === null || type === '') {
+        return statusMap[0].status
+      } else {
+        return statusMap[type].status
+      }
+    },
+    endTypeFilter (type) {
+      if (type === undefined || type === null || type === '') {
+        return endTypeMap[0].text
+      } else {
+        return endTypeMap[type].text
+      }
+    },
+    endTypeTypeFilter (type) {
+      if (type === undefined || type === null || type === '') {
+        return endTypeMap[0].status
+      } else {
+        return endTypeMap[type].status
+      }
     }
   },
   created () {
-    console.log('created')
     // getRoleList({ t: new Date() })
   },
   computed: {
@@ -211,6 +309,22 @@ export default {
     }
   },
   methods: {
+    sendInfoAction (record, value) {
+      // 更新记录中的选项值
+     const receiveID = record.id
+     const status = Number(value)
+      if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
+        const con = RequestConFactory(this.selectSendInfo)
+        receiveActionCon(con, { 'receive_id': receiveID, 'status': status }).then(res => {
+          if (res.status === 200) {
+            this.$refs.table.refresh()
+            this.$message.success(res.message)
+          } else {
+            this.$message.error(res.message)
+          }
+        })
+      }
+    },
     updateMenu () {
       this.$store.commit(UPDATE_MENU_TYPE)
     },
@@ -233,51 +347,61 @@ export default {
       console.log('record', record)
       this.visible = true
       this.mdl = { ...record }
-      console.log('mdl', this.mdl)
+      console.log('record2', this.mdl)
+    },
+    receiveMessageListShow (record) {
+      this.receiveID = record.id
+      this.receiveMessageListVisible = true
+    },
+    receiveMessageListCancel () {
+      this.sendID = 0
+      this.receiveMessageListVisible = false
     },
     handleDelete (id) {
-      if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
-        const con = RequestConFactory(this.selectSendInfo)
-        delMessage(con, id).then(res => {
-          if (res.status === 200) {
-            this.$refs.table.refresh()
-            this.$message.success(res.message)
-          } else {
-            this.$message.error(res.message)
-          }
-        })
-      }
+      deleteSuperSend(id).then(res => {
+        if (res.status === 200) {
+          this.$refs.table.refresh()
+          this.$message.success(res.message)
+        } else {
+          this.$message.error(res.message)
+        }
+      })
     },
     handleOk () {
-      const formData = this.$refs.createModal.getFormData()
-      console.log('表单数据', formData)
       const form = this.$refs.createModal.form
       this.confirmLoading = true
+      const saveData = this.$refs.createModal.saveData
       form.validateFields((errors, values) => {
         if (!errors) {
           console.log('values', values)
-          if (values.id > 0) {
+          if (saveData.id > 0) {
+            const formData = this.$refs.createModal.getFormData('update')
+            console.log('表单数据', formData)
             // 修改 e.g.
-            setMessage(values).then(res => {
-              if (res.status === 200) {
-                this.visible = false
-                this.confirmLoading = false
-                // 重置表单数据
-                form.resetFields()
-                // 刷新表格
-                this.$refs.table.refresh()
-
-                this.$message.success(res.message)
-              } else {
-                this.confirmLoading = false
-                this.$message.error(res.message)
-              }
-            })
-          } else {
-            if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
+            if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0) {
               const con = RequestConFactory(this.selectSendInfo)
-              // 新增
-              setMessage(con, formData).then(res => {
+              setReceiveCon(con, formData).then(res => {
+                if (res.status === 200) {
+                  this.visible = false
+                  this.confirmLoading = false
+                  // 重置表单数据
+                  form.resetFields()
+                  // 刷新表格
+                  this.$refs.table.refresh()
+
+                  this.$message.success(res.message)
+                } else {
+                  this.confirmLoading = false
+                  this.$message.error(res.message)
+                }
+              })
+            }
+          } else {
+            const formData = this.$refs.createModal.getFormData('add')
+            console.log('表单数据', formData)
+            if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0) {
+              const con = RequestConFactory(this.selectSendInfo)
+              addReceive(con, formData).then(res => {
                 if (res.status === 200) {
                   this.visible = false
                   this.confirmLoading = false

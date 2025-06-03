@@ -52,6 +52,21 @@ export const constantRouterMap = [
             meta: { title: '节点列表', keepAlive: true, permission: [] }
           }
         ]
+      },
+      {
+        path: '/etcd_bridge',
+        name: 'etcd_bridge',
+        component: RouteView,
+        redirect: '/etcd_bridge/users',
+        meta: { title: 'etcd-bridge工具', icon: 'table', permission: [] },
+        children: [
+          {
+            path: '/etcd_bridge/users',
+            name: 'etcd_bridge_users',
+            component: () => import('@/views/etcd_bridge/users'),
+            meta: { title: '节点列表', keepAlive: true, permission: [] }
+          }
+        ]
       }
     ]
   },

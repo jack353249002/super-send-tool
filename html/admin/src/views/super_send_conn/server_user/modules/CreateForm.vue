@@ -1,6 +1,6 @@
 <template>
   <a-modal
-    title="super_send账号"
+    title="server用户"
     :width="640"
     :visible="visible"
     :confirmLoading="loading"
@@ -13,23 +13,11 @@
         <a-form-item v-show="model && model.id > 0" label="主键ID">
           <a-input v-decorator="['id', { initialValue: 0 }]" disabled />
         </a-form-item>
-        <a-form-item label="是否开启ssl">
-          <a-radio-group v-decorator="['is_ssl', { initialValue: '0', rules: [{ required: true, message: '请选择状态' }] }]">
-            <a-radio value="0">关闭</a-radio>
-            <a-radio value="1">开启</a-radio>
-          </a-radio-group>
-        </a-form-item>
-        <a-form-item label="地址">
-          <a-input v-decorator="['address', {rules: [{required: true, message: '请输入地址'}]}]" />
-        </a-form-item>
         <a-form-item label="用户名">
           <a-input v-decorator="['username', {rules: [{required: true, message: '请输入用户名'}]}]" />
         </a-form-item>
         <a-form-item label="密码">
           <a-input-password v-decorator="['password', {rules: [{required: true, message: '请输入密码'}]}]" />
-        </a-form-item>
-        <a-form-item label="token刷新间隔">
-          <a-input v-decorator="['refresh_token_interval', {rules: [{required: false, message: '刷新token间隔'}]}]" />
         </a-form-item>
       </a-form>
     </a-spin>
@@ -40,7 +28,7 @@
 import pick from 'lodash.pick'
 
 // 表单字段
-const fields = ['address', 'is_ssl', 'username', 'password', 'id', 'refresh_token_interval']
+const fields = ['username', 'password', 'id']
 
 export default {
   props: {

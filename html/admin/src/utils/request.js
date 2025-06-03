@@ -37,6 +37,31 @@ export const createRequestCon = function (superSendInfo) {
   }, errorHandler)
   return { request: requestSuperSend, superSendInfo: superSendInfo }
 }
+export const createEtcdBridgeRequestCon = function (etcdBridgeInfo) {
+  var requestEtcdBridge = axios.create({
+    // API 请求的默认前缀
+    baseURL: process.env.VUE_APP_API_BASE_URL,
+    timeout: 6000 // 请求超时时间
+  })
+  // request interceptor
+  requestEtcdBridge.interceptors.request.use(config => {
+    const token = etcdBridgeInfo.token
+    const etcdBridgeID = etcdBridgeInfo.id
+    // 如果 token 存在
+    // 让每个请求携带自定义 token 请根据实际情况自行修改
+    if (token) {
+      config.headers['token'] = token
+    }
+    if (etcdBridgeID > 0) {
+      config.headers['etcd_bridge_id'] = etcdBridgeID
+    }
+    return config
+  }, errorHandler)
+  requestEtcdBridge().interceptors.response.use((response) => {
+    return response.data
+  }, errorHandler)
+  return { request: requestEtcdBridge(), etcdBridgeInfo: etcdBridgeInfo }
+}
 // 异常拦截处理器
 const errorHandler = (error) => {
   if (error.response) {

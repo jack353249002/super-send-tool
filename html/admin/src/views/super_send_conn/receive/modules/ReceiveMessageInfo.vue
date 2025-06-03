@@ -1,53 +1,42 @@
 <template>
   <a-modal
-    title="设置发送配置"
+    title="接收消息详情"
     width="100%"
     wrap-class-name="full-modal"
-    :visible="visible"
+    :visible="receiveMessageInfoVisible"
     :confirmLoading="loading"
     class="draggable-modal"
     ref="headerUploadRef"
-    @ok="() => { $emit('ok') }"
+    :footer="null"
     @cancel="() => { $emit('cancel') }"
   >
     <a-spin :spinning="loading">
-      <a-form :form="form" v-bind="formLayout">
+      <a-form class="box" :form="form" v-bind="formLayout">
         <!-- 检查是否有 id 并且大于0，大于0是修改。其他是新增，新增不显示主键ID -->
-        <a-form-item v-show="model && model.id > 0" label="主键ID">
-          <a-input v-model="saveData.id" disabled />
+        <a-form-item label="标题">
+          <a-input v-decorator="['subject', {rules: [{required: true, message: '标题'}]}]" />
         </a-form-item>
-        <a-form-item label="标题" v-show="!model">
-          <a-input v-model="saveData.title" />
+        <a-form-item label="imap服务器">
+          <a-input v-decorator="['imap_server_text', {rules: [{required: true, message: 'imap服务器'}]}]" />
         </a-form-item>
-        <a-form-item label="选择消息模板" v-show="!model">
-          <v-selectpage
-            placeholder="请选择一个选项"
-            field="name"
-            value-field="id"
-            v-model="saveData.message_id"
-            :data="messageListPath"
-            :params="selectSendInfo"
-            :result-format="formatResult"
-            ref="messageSelectPage"
-          >
-          </v-selectpage>
+        <a-form-item label="sender_address">
+          <a-input v-decorator="['sender_address', {rules: [{required: true, message: 'sender_address'}]}]" />
         </a-form-item>
-        <a-form-item label="选择服务器">
-          <v-selectpage
-            placeholder="请选择一个选项"
-            field="name"
-            value-field="id"
-            v-model="saveData.send_server_id"
-            :data="smtpList"
-            :params="selectSendInfo"
-            :multiple="true"
-            :pagination="false"
-            ref="serverSelectPage"
-          >
-          </v-selectpage>
+        <a-form-item label="发送时间">
+          <a-input v-decorator="['date', {rules: [{required: true, message: '发送时间'}]}]" />
         </a-form-item>
-        <a-form-item label="接收者账号(逗号分割)" v-show="!model">
-          <a-input v-model="saveData.receive" />
+        <a-form-item label="message_id">
+          <a-input v-decorator="['message_id', {rules: [{required: true, message: 'message_id'}]}]" />
+        </a-form-item>
+        <a-form-item label="邮件内容">
+          <div class="email-content"  v-html="this.model.body"></div>
+        </a-form-item>
+        <a-form-item label="附件列表">
+          <ul>
+            <li v-for="(attachment, index) in this.model.file_paths" :key="index">
+              <a :href="attachment" :download="getFileName(attachment)">{{attachment}}</a>
+            </li>
+          </ul>
         </a-form-item>
       </a-form>
     </a-spin>
@@ -59,25 +48,20 @@ import 'vue-draggable-resizable/dist/VueDraggableResizable.css'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
-import { getMessageList, getSmtpServerList, RequestConFactory, superSendApi } from '@/api/super_send'
-// const fields = ['message_id', 'title', 'send_model', 'send_server_id', 'dispatch_model', 'receive']// 表单字段
+import { getSmtpServerList, RequestConFactory, superSendApi } from '@/api/super_send'
+import pick from 'lodash.pick'
+const fields = ['subject', 'sender_address', 'date', 'message_id', 'body', 'file_paths', 'imap_server_text']// 表单字段
 export default {
   components: {
   },
   watch: {
-    selectSendInfo: {
-      handler (newVal, oldVal) {
-        this.getSmtpList()
-      },
-      deep: true // 深度监听
-    }
   },
   props: {
     selectSendInfo: {
       type: Object,
       required: true
     },
-    visible: {
+    receiveMessageInfoVisible: {
       type: Boolean,
       required: true
     },
@@ -91,6 +75,7 @@ export default {
     }
   },
   mounted () {
+    // this.getSmtpList()
   },
   methods: {
     getFormData (type) {
@@ -169,44 +154,10 @@ export default {
         this.smtpList = []
       }
     },
-    SearchMessageList (keywords, pageNo) {
-      const requestParameters = { 'keyWords': keywords, 'pageSize': 10, 'pageNo': pageNo }
-      if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0) {
-        const con = RequestConFactory(this.selectSendInfo)
-        getMessageList(con, requestParameters)
-          .then(res => {
-            console.log(res)
-            if (res.status === 200) {
-              if (res.result.data !== null) {
-                const listTemp = []
-                for (let i = 0; i < res.result.data.length; i++) {
-                  listTemp.push({ id: res.result.data[i].id, name: res.result.data[i].title })
-                }
-                // this.total = res.result.totalCount
-                this.list = listTemp
-                this.page = pageNo
-                this.total = 50
-                // this.messageListInfo = { list: res.result.data, total: res.result.totalPage, page: res.result.pageNo, size: res.result.pageSize }
-              } else {
-                this.list = []
-                this.total = 0
-                this.page = 1
-              }
-            } else if (res.status === 401) {
-              this.list = []
-              this.total = 0
-              this.page = 1
-            } else {
-              this.list = []
-              this.total = 0
-              this.page = 1
-            }
-          })
-      } else {
-        this.total = 0
-        this.page = 1
-        this.list = []
-      }
+    getFileName (url) {
+      // 提取文件名
+      const parts = url.split('/')
+      return parts[parts.length - 1]
     }
   },
   data () {
@@ -248,31 +199,14 @@ export default {
   },
   created () {
     console.log('custom modal created')
-     // this.SearchMessageList('', 1)
+
     // 防止表单未注册
-    // eslint-disable-next-line no-unreachable
-    // fields.forEach(v => this.form.getFieldDecorator(v))
+    fields.forEach(v => this.form.getFieldDecorator(v))
+
     // 当 model 发生改变时，为表单设置值
     this.$watch('model', () => {
       // 设置表单的初始值
-      // this.model && this.form.setFieldsValue(pick(this.model, fields))
-      this.saveData.title = ''
-      this.saveData.id = 0
-      this.saveData.message_id = ''
-      this.saveData.send_server_id = ''
-      this.saveData.receive = ''
-      if (!this.model) {
-        this.$refs.messageSelectPage.remove()
-        this.$refs.serverSelectPage.remove()
-      }
-      console.log('model', this.model)
-      if (this.model && this.model.id > 0) {
-        this.saveData.title = this.model.title
-        this.saveData.id = this.model.id
-        // this.saveData.message_id = String(this.model.message_id)
-        this.saveData.send_server_id = String(this.model.send_server_id)
-        console.log('saveData', this.saveData)
-      }
+      this.model && this.form.setFieldsValue(pick(this.model, fields))
     })
   }
 }
@@ -294,5 +228,17 @@ export default {
   .ant-modal-body {
     flex: 1;
   }
+}
+.box {
+  height: 600px; /* 调整高度以适应搜索和操作区域 */
+  overflow-y: auto; /* 启用垂直滚动条 */
+}
+.email-content {
+  width: 100%;
+  height: 500px;
+  overflow-y: auto;
+  border: 1px solid #ccc;
+  padding: 10px;
+  background-color: #f9f9f9;
 }
 </style>

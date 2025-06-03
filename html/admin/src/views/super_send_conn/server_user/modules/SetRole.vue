@@ -1,6 +1,6 @@
 <template>
   <a-modal
-    title="设置发送配置"
+    title="设置角色"
     width="100%"
     wrap-class-name="full-modal"
     :visible="visible"
@@ -14,40 +14,24 @@
       <a-form :form="form" v-bind="formLayout">
         <!-- 检查是否有 id 并且大于0，大于0是修改。其他是新增，新增不显示主键ID -->
         <a-form-item v-show="model && model.id > 0" label="主键ID">
-          <a-input v-model="saveData.id" disabled />
+          <a-input v-model="model.id" disabled />
         </a-form-item>
-        <a-form-item label="标题" v-show="!model">
-          <a-input v-model="saveData.title" />
+        <a-form-item v-show="model && model.id > 0" label="用户名">
+          <a-input v-model="model.username" disabled />
         </a-form-item>
-        <a-form-item label="选择消息模板" v-show="!model">
+        <a-form-item label="选择角色">
           <v-selectpage
             placeholder="请选择一个选项"
             field="name"
             value-field="id"
-            v-model="saveData.message_id"
-            :data="messageListPath"
+            :data="roleList"
             :params="selectSendInfo"
-            :result-format="formatResult"
-            ref="messageSelectPage"
-          >
-          </v-selectpage>
-        </a-form-item>
-        <a-form-item label="选择服务器">
-          <v-selectpage
-            placeholder="请选择一个选项"
-            field="name"
-            value-field="id"
-            v-model="saveData.send_server_id"
-            :data="smtpList"
-            :params="selectSendInfo"
+            v-model="rolestr"
             :multiple="true"
             :pagination="false"
-            ref="serverSelectPage"
+            ref="roleSelectPage"
           >
           </v-selectpage>
-        </a-form-item>
-        <a-form-item label="接收者账号(逗号分割)" v-show="!model">
-          <a-input v-model="saveData.receive" />
         </a-form-item>
       </a-form>
     </a-spin>
@@ -59,7 +43,13 @@ import 'vue-draggable-resizable/dist/VueDraggableResizable.css'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
-import { getMessageList, getSmtpServerList, RequestConFactory, superSendApi } from '@/api/super_send'
+import {
+  addServerRolesFroUserCon, delServerUserRoleCon,
+  getMessageList, getServerRolesCon,
+  getServerUserInfoCon,
+  RequestConFactory,
+  superSendApi
+} from '@/api/super_send'
 // const fields = ['message_id', 'title', 'send_model', 'send_server_id', 'dispatch_model', 'receive']// 表单字段
 export default {
   components: {
@@ -67,9 +57,36 @@ export default {
   watch: {
     selectSendInfo: {
       handler (newVal, oldVal) {
-        this.getSmtpList()
+        this.getUserInfo(newVal.id)
       },
       deep: true // 深度监听
+    },
+    rolestr: {
+      handler (newVal, oldVal) {
+        // 将 rolestr 拆分为数组
+        console.log('rolestr-in', newVal)
+        console.log('rolestr-in2', typeof oldVal)
+        const newRoleArray = newVal ? newVal.split(',') : []
+        const oldRoleArray = oldVal ? oldVal.split(',') : []
+        console.log('newRoleArray', newRoleArray)
+        console.log('oldRoleArray', oldRoleArray)
+        console.log('firstIn', this.firstIn)
+        if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined && this.model.id !== 0 && this.needRequest) {
+          const con = RequestConFactory(this.selectSendInfo)
+          // 找出新增的元素
+          const addedRoles = newRoleArray.filter(role => !oldRoleArray.includes(role))
+          for (const role of addedRoles) {
+            addServerRolesFroUserCon(con, { 'role': role, 'username': this.model.username })
+          }
+          // 找出减少的元素
+          const removedRoles = oldRoleArray.filter(role => !newRoleArray.includes(role))
+          for (const role of removedRoles) {
+            delServerUserRoleCon(con, { 'role': role, 'username': this.model.username })
+          }
+        }
+        this.needRequest = true
+      },
+      deep: true
     }
   },
   props: {
@@ -94,19 +111,29 @@ export default {
   },
   methods: {
     getFormData (type) {
-      // 返回表单数据
-      if (type === 'add') {
-        return {
-          title: this.saveData.title,
-          message_id: this.saveData.message_id,
-          send_server_id: this.saveData.send_server_id,
-          receive: this.saveData.receive
-        }
-      } else {
-        return {
-          id: this.saveData.id,
-          send_server_id: this.saveData.send_server_id
-        }
+
+    },
+    clearSelectPage () {
+      this.needRequest = false
+      this.model.id = 0
+      this.rolestr = null
+    },
+    getUserInfo (id) {
+      this.getRoles()
+      if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
+        const con = RequestConFactory(this.selectSendInfo)
+        getServerUserInfoCon(con, { id: id }).then(res => {
+          this.firstIn = true
+          if (res.status === 200) {
+            if (res.result.roles != null) {
+              this.needRequest = false
+              this.rolestr = res.result.roles.join(',')
+            }
+            console.log('rolestr', this.rolestr)
+          } else {
+            this.rolestr = ''
+          }
+        })
       }
     },
     formatResult (response) {
@@ -141,32 +168,33 @@ export default {
       this.keywords = keywords
       // this.SearchMessageList(keywords, 1)
     },
-    getSmtpList () {
+    getRoles () {
       if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
+        console.log('getRoles')
         const con = RequestConFactory(this.selectSendInfo)
-        getSmtpServerList(con, {})
+        getServerRolesCon(con, {})
           .then(res => {
             console.log(res)
             if (res.status === 200) {
               if (res.result.data !== null) {
                 const listTemp = []
                 for (let i = 0; i < res.result.data.length; i++) {
-                  listTemp.push({ id: res.result.data[i].id, name: res.result.data[i].name })
+                  listTemp.push({ id: res.result.data[i].role, name: res.result.data[i].role })
                 }
                 // this.total = res.result.totalCount
-                this.smtpList = listTemp
+                this.roleList = listTemp
                 // this.messageListInfo = { list: res.result.data, total: res.result.totalPage, page: res.result.pageNo, size: res.result.pageSize }
               } else {
-                this.smtpList = []
+                this.roleList = []
               }
             } else if (res.status === 401) {
-              this.smtpList = []
+              this.roleList = []
             } else {
-              this.smtpList = []
+              this.roleList = []
             }
           })
       } else {
-        this.smtpList = []
+        this.roleList = []
       }
     },
     SearchMessageList (keywords, pageNo) {
@@ -221,7 +249,9 @@ export default {
       }
     }
     return {
-      saveData: {},
+      needRequest: true,
+      rolestr: '',
+      saveData: { 'rolestr': '' },
       messageListPath: superSendApi.GetMessageList,
       smtpServerListPath: superSendApi.GetSmtpServerList,
       selectedValue: null, // 用于绑定选择的值
@@ -241,37 +271,22 @@ export default {
       attrCount: 0,
       isEditingAttach: false,
       serverIds: null,
-      smtpList: [],
+      roleList: [],
       messageSelectPage: {},
       serverSelectPage: {}
     }
   },
   created () {
     console.log('custom modal created')
-     // this.SearchMessageList('', 1)
+    // this.SearchMessageList('', 1)
     // 防止表单未注册
     // eslint-disable-next-line no-unreachable
     // fields.forEach(v => this.form.getFieldDecorator(v))
     // 当 model 发生改变时，为表单设置值
     this.$watch('model', () => {
-      // 设置表单的初始值
-      // this.model && this.form.setFieldsValue(pick(this.model, fields))
-      this.saveData.title = ''
-      this.saveData.id = 0
-      this.saveData.message_id = ''
-      this.saveData.send_server_id = ''
-      this.saveData.receive = ''
-      if (!this.model) {
-        this.$refs.messageSelectPage.remove()
-        this.$refs.serverSelectPage.remove()
-      }
-      console.log('model', this.model)
       if (this.model && this.model.id > 0) {
-        this.saveData.title = this.model.title
-        this.saveData.id = this.model.id
-        // this.saveData.message_id = String(this.model.message_id)
-        this.saveData.send_server_id = String(this.model.send_server_id)
-        console.log('saveData', this.saveData)
+        console.log('model', this.model)
+          this.getUserInfo(this.model.id)
       }
     })
   }

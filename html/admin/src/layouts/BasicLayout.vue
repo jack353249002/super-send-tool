@@ -226,6 +226,36 @@ export default {
                     name: `super_send_conn_${id}_smtp`,
                     component: () => import(`@/views/super_send_conn/smtp`),
                     meta: { title: 'smtp服务器', keepAlive: false, permission: [] }
+                  },
+                  {
+                    path: `/super_send_conn${id}/conf?id=${id}`,
+                    name: `super_send_conn_${id}_conf`,
+                    component: () => import(`@/views/super_send_conn/conf`),
+                    meta: { title: '配置文件管理', keepAlive: false, permission: [] }
+                  },
+                  {
+                    path: `/super_send_conn${id}/imap?id=${id}`,
+                    name: `super_send_conn_${id}imap`,
+                    component: () => import(`@/views/super_send_conn/imap`),
+                    meta: { title: 'imap服务器', keepAlive: false, permission: [] }
+                  },
+                  {
+                    path: `/super_send_conn${id}/receive?id=${id}`,
+                    name: `super_send_conn_${id}_receive`,
+                    component: () => import(`@/views/super_send_conn/receive`),
+                    meta: { title: '接收配置管理', keepAlive: false, permission: [] }
+                  },
+                  {
+                    path: `/super_send_conn${id}/server_user?id=${id}`,
+                    name: `super_send_conn_${id}_server_user`,
+                    component: () => import(`@/views/super_send_conn/server_user`),
+                    meta: { title: '服务用户管理', keepAlive: false, permission: [] }
+                  },
+                  {
+                    path: `/super_send_conn${id}/auth?id=${id}`,
+                    name: `super_send_conn_${id}_auth`,
+                    component: () => import(`@/views/super_send_conn/auth`),
+                    meta: { title: '权限管理', keepAlive: false, permission: [] }
                   }
                 ]
               })

@@ -2,28 +2,10 @@
   <a-card :bordered="false">
     <div class="table-page-search-wrapper">
       <a-form layout="inline">
-        <a-row :gutter="48">
-          <a-col :md="8" :sm="24">
-            <a-form-item label="关键词">
-              <a-input v-model="queryParam.keyWords" placeholder=""/>
-            </a-form-item>
-          </a-col>
-          <a-col :md="!advanced && 8 || 24" :sm="24">
-            <span class="table-page-search-submitButtons" :style="advanced && { float: 'right', overflow: 'hidden' } || {} ">
-              <a-button type="primary" @click="$refs.table.refresh(true)">查询</a-button>
-              <a-button style="margin-left: 8px" @click="() => queryParam = {}">重置</a-button>
-            </span>
-          </a-col>
-        </a-row>
       </a-form>
     </div>
     <div class="table-operator">
       <a-button type="primary" icon="plus" @click="handleAdd">新建</a-button>
-      <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
-        <a-menu slot="overlay">
-          <a-menu-item key="1"><a-icon type="delete" />删除</a-menu-item>
-        </a-menu>
-      </a-dropdown>
     </div>
 
     <s-table
@@ -39,11 +21,8 @@
       <span slot="serial" slot-scope="text, record, index">
         {{ index + 1 }}
       </span>
-      <span slot="created_at" slot-scope="text">
-        {{ text | timestampToString }}
-      </span>
-      <span slot="is_ssl" slot-scope="text">
-        <a-badge :status="text | isSSLTypeFilter" :text="text | isSSLFilter" />
+      <span slot="is_root" slot-scope="text">
+        <a-badge :status="text | isRootTypeFilter" :text="text | isRootFilter" />
       </span>
       <span slot="description" slot-scope="text">
         <ellipsis :length="4" tooltip>{{ text }}</ellipsis>
@@ -51,14 +30,13 @@
 
       <span slot="action" slot-scope="text, record">
         <template>
-          <a-divider type="vertical" />
-          <a @click="handleEdit(record)">配置</a>
-          <a-divider type="vertical" />
+         <a @click="handelRolesAuth(record)">权限配置</a>
+         <a-divider type="vertical" />
           <a-popconfirm
             title="确定要删除此记录吗？"
             ok-text="确定"
             cancel-text="取消"
-            @confirm="handleDelete(record.id)"
+            @confirm="handleDelete(record.role)"
           >
             <a-button type="link" danger>删除</a-button>
           </a-popconfirm>
@@ -67,47 +45,41 @@
     </s-table>
     <create-form
       ref="createModal"
-      :quillEditor="quillEditor"
-      :selectSendInfo="selectSendInfo"
       :visible="visible"
       :loading="confirmLoading"
       :model="mdl"
       @cancel="handleCancel"
       @ok="handleOk"
     />
-    <step-by-step-modal ref="modal" @ok="handleOk"/>
+    <roles-auth
+      :visible="visibleRolesAuth"
+      :loading="confirmLoadingRolesAuth"
+      :roleStr="roleStr"
+      :select-send-info="selectSendInfo"
+      @cancel="handelRolesAuthCancel"
+      @ok="false"
+    />
   </a-card>
 </template>
 
 <script>
 import { STable } from '@/components'
-import dayjs from 'dayjs'
 import {
- delMessage, getMessageList, RequestConFactory, setMessage, setSuperSendOnline
+  addRoleCon, delRoleCon,
+  getRolesListCon,
+  login, register, RequestConFactory, setServerUserPasswordCon,
+  setSuperSendOnline
 } from '@/api/super_send'
 import CreateForm from './modules/CreateForm'
 import { UPDATE_MENU_TYPE } from '@/store/mutation-types'
-import VueDraggableResizable from 'vue-draggable-resizable'
-import 'vue-draggable-resizable/dist/VueDraggableResizable.css'
 import { mapState } from 'vuex'
-
+import RolesAuth from '@/views/super_send_conn/auth/modules/RolesAuth.vue'
 // import router from '@/router'
 // import store from '@/store'
 const columns = [
   {
-    title: 'id',
-    dataIndex: 'id'
-  },
-  {
-    title: '标题',
-    dataIndex: 'title'
-  },
-  {
-    title: '创建时间',
-    dataIndex: 'createtime',
-    customRender: (text) => {
-      return dayjs(text * 1000).format('YYYY-MM-DD HH:mm:ss')
-    }
+    title: 'role',
+    dataIndex: 'role'
   },
   {
     title: '操作',
@@ -117,7 +89,7 @@ const columns = [
   }
 ]
 
-const isSSLMap = {
+const isRootMap = {
   0: {
     status: 'default',
     text: '否'
@@ -131,9 +103,9 @@ const isSSLMap = {
 export default {
   name: 'TableList',
   components: {
+    RolesAuth,
     STable,
-    CreateForm,
-    VueDraggableResizable
+    CreateForm
   },
   watch: {
     nowSendInfo: {
@@ -143,28 +115,39 @@ export default {
         this.$refs.table.refresh(true)
       },
       deep: true // 深度监听
-      // immediate: true 立即触发一次监听器
     }
   },
   data () {
     this.columns = columns
     return {
+      selectSendInfo: {},
       // create model
       visible: false,
+      visibleRolesAuth: false,
       confirmLoading: false,
+      confirmLoadingRolesAuth: false,
+      roleStr: '',
       mdl: null,
       // 高级搜索 展开/关闭
       advanced: false,
       // 查询参数
       queryParam: { 'keyWords': '' },
+      visibleUserPassword: false,
+      confirmLoadingUserPassword: false,
+      mdlSetUserPassword: null,
+      visibleSetRole: false,
+      confirmLoadingRole: false,
+      mdlSetRole: null,
       // 加载数据方法 必须为 Promise 对象
       loadData: parameter => {
-         if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
+        const requestParameters = Object.assign({}, parameter, this.queryParam)
+        console.log('loadData request parameters:', requestParameters)
+        if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
           const requestParameters = Object.assign({}, parameter, this.queryParam)
           console.log('loadData request parameters:', requestParameters)
-          console.log('loadData', this.selectSendInfo)
+          console.log(this.selectSendInfo)
           const con = RequestConFactory(this.selectSendInfo)
-          return getMessageList(con, requestParameters)
+          return getRolesListCon(con, requestParameters)
             .then(res => {
               if (res.status === 200) {
                 if (res.result.data !== null) {
@@ -179,24 +162,28 @@ export default {
               }
             })
         } else {
-           return Promise.resolve({ data: [], total: 0 })
+          return Promise.resolve({ data: [], total: 0 })
         }
       },
       selectedRowKeys: [],
-      selectedRows: [],
-      selectSendInfo: {}
+      selectedRows: []
     }
   },
   filters: {
-    isSSLFilter (type) {
-      return isSSLMap[type].text
+    isRootFilter (type) {
+      if (type === undefined || type === null || type === '') {
+        return '否'
+      }
+      return isRootMap[type].text
     },
-    isSSLTypeFilter (type) {
-      return isSSLMap[type].status
+    isRootTypeFilter (type) {
+      if (type === undefined || type === null || type === '') {
+        return 'default'
+      }
+      return isRootMap[type].status
     }
   },
   created () {
-    console.log('created')
     // getRoleList({ t: new Date() })
   },
   computed: {
@@ -214,9 +201,27 @@ export default {
     updateMenu () {
       this.$store.commit(UPDATE_MENU_TYPE)
     },
+    handleRegister (record) {
+      register(record.token, record.id, record).then(res => {
+        if (res.status === 200) {
+          this.$message.success(res.message)
+        } else {
+          this.$message.error(res.message)
+        }
+      })
+    },
     handleOnline (id, online) {
       setSuperSendOnline(id, online).then(res => {
         if (res.status === 200) {
+          if (online === 1) {
+            login(id).then(res => {
+              if (res.status === 200) {
+                this.$message.success(res.message)
+              } else {
+                this.$message.error(res.message)
+              }
+            })
+          }
           this.$refs.table.refresh()
           this.updateMenu()
           this.$message.success(res.message)
@@ -225,20 +230,34 @@ export default {
         }
       })
     },
+    handelSetUserPassword (record) {
+      this.visibleUserPassword = true
+      this.mdlSetUserPassword = { ...record }
+    },
+    handelSetRole (record) {
+      this.visibleSetRole = true
+      this.mdlSetRole = { ...record }
+    },
+    handelRolesAuth (record) {
+      this.roleStr = record.role
+      this.visibleRolesAuth = true
+    },
+    handelRolesAuthCancel () {
+      this.visibleRolesAuth = false
+      this.roleStr = ''
+    },
     handleAdd () {
       this.mdl = null
       this.visible = true
     },
     handleEdit (record) {
-      console.log('record', record)
       this.visible = true
       this.mdl = { ...record }
-      console.log('mdl', this.mdl)
     },
-    handleDelete (id) {
+    handleDelete (role) {
       if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
         const con = RequestConFactory(this.selectSendInfo)
-        delMessage(con, id).then(res => {
+        delRoleCon(con, [{ 'role': role }]).then(res => {
           if (res.status === 200) {
             this.$refs.table.refresh()
             this.$message.success(res.message)
@@ -249,16 +268,15 @@ export default {
       }
     },
     handleOk () {
-      const formData = this.$refs.createModal.getFormData()
-      console.log('表单数据', formData)
       const form = this.$refs.createModal.form
       this.confirmLoading = true
       form.validateFields((errors, values) => {
         if (!errors) {
           console.log('values', values)
-          if (values.id > 0) {
-            // 修改 e.g.
-            setMessage(values).then(res => {
+          if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0) {
+            const con = RequestConFactory(this.selectSendInfo)
+            // 新增
+            addRoleCon(con, values).then(res => {
               if (res.status === 200) {
                 this.visible = false
                 this.confirmLoading = false
@@ -269,30 +287,9 @@ export default {
 
                 this.$message.success(res.message)
               } else {
-                this.confirmLoading = false
                 this.$message.error(res.message)
               }
             })
-          } else {
-            if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
-              const con = RequestConFactory(this.selectSendInfo)
-              // 新增
-              setMessage(con, formData).then(res => {
-                if (res.status === 200) {
-                  this.visible = false
-                  this.confirmLoading = false
-                  // 重置表单数据
-                  form.resetFields()
-                  // 刷新表格
-                  this.$refs.table.refresh()
-
-                  this.$message.success(res.message)
-                } else {
-                  this.confirmLoading = false
-                  this.$message.error(res.message)
-                }
-              })
-            }
           }
         } else {
           this.confirmLoading = false
@@ -312,6 +309,43 @@ export default {
         this.$message.error(`${record.no} 订阅失败，规则已关闭`)
       }
     },
+    handleSetUserPasswordOk () {
+      const form = this.$refs.setUserPasswordModal.form
+      this.confirmLoading = true
+      form.validateFields((errors, values) => {
+        if (!errors) {
+          if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0) {
+            const con = RequestConFactory(this.selectSendInfo)
+            // 新增
+            setServerUserPasswordCon(con, values).then(res => {
+              if (res.status === 200) {
+                this.visibleUserPassword = false
+                this.confirmLoadingUserPassword = false
+                // 重置表单数据
+                form.resetFields()
+
+                this.$message.success(res.message)
+              } else {
+                this.$message.error(res.message)
+              }
+            })
+          }
+        } else {
+          this.confirmLoadingUserPassword = false
+        }
+      })
+    },
+    handleSetUserPasswordCancel () {
+      this.visibleUserPassword = false
+      const form = this.$refs.setUserPasswordModal.form
+      form.resetFields() // 清理表单数据（可不做）
+    },
+    handleRoleCancel () {
+      this.visibleSetRole = false
+      const form = this.$refs.setRoleModal.form
+      form.resetFields() // 清理表单数据（可不做）
+      this.$refs.setRoleModal.clearSelectPage()
+    },
     onSelectChange (selectedRowKeys, selectedRows) {
       this.selectedRowKeys = selectedRowKeys
       this.selectedRows = selectedRows
@@ -327,9 +361,3 @@ export default {
   }
 }
 </script>
-<style scoped>
-.draggable-box {
-  border: 2px solid red;  /* 添加边框 */
-  border-radius: 5px;       /* 可选：设置圆角 */
-}
-</style>

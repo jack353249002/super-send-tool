@@ -1,6 +1,6 @@
 <template>
   <a-modal
-    title="设置发送配置"
+    title="设置接收配置"
     width="100%"
     wrap-class-name="full-modal"
     :visible="visible"
@@ -19,26 +19,16 @@
         <a-form-item label="标题" v-show="!model">
           <a-input v-model="saveData.title" />
         </a-form-item>
-        <a-form-item label="选择消息模板" v-show="!model">
-          <v-selectpage
-            placeholder="请选择一个选项"
-            field="name"
-            value-field="id"
-            v-model="saveData.message_id"
-            :data="messageListPath"
-            :params="selectSendInfo"
-            :result-format="formatResult"
-            ref="messageSelectPage"
-          >
-          </v-selectpage>
+        <a-form-item label="接收规则" v-show="!model">
+          <a-input v-model="saveData.receive_rule" />
         </a-form-item>
         <a-form-item label="选择服务器">
           <v-selectpage
             placeholder="请选择一个选项"
             field="name"
             value-field="id"
-            v-model="saveData.send_server_id"
-            :data="smtpList"
+            v-model="saveData.receive_server_id"
+            :data="imapList"
             :params="selectSendInfo"
             :multiple="true"
             :pagination="false"
@@ -46,8 +36,11 @@
           >
           </v-selectpage>
         </a-form-item>
-        <a-form-item label="接收者账号(逗号分割)" v-show="!model">
-          <a-input v-model="saveData.receive" />
+        <a-form-item label="结束类型">
+          <a-radio-group v-model="saveData.end_type">
+            <a-radio value="0">永久运行</a-radio>
+            <a-radio value="1">自动结束</a-radio>
+          </a-radio-group>
         </a-form-item>
       </a-form>
     </a-spin>
@@ -59,7 +52,12 @@ import 'vue-draggable-resizable/dist/VueDraggableResizable.css'
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.snow.css'
 import 'quill/dist/quill.bubble.css'
-import { getMessageList, getSmtpServerList, RequestConFactory, superSendApi } from '@/api/super_send'
+import {
+  getImapAllServerCon,
+  getMessageList,
+  RequestConFactory,
+  superSendApi
+} from '@/api/super_send'
 // const fields = ['message_id', 'title', 'send_model', 'send_server_id', 'dispatch_model', 'receive']// 表单字段
 export default {
   components: {
@@ -67,7 +65,7 @@ export default {
   watch: {
     selectSendInfo: {
       handler (newVal, oldVal) {
-        this.getSmtpList()
+        this.getImapList()
       },
       deep: true // 深度监听
     }
@@ -91,6 +89,7 @@ export default {
     }
   },
   mounted () {
+    this.getImapList()
   },
   methods: {
     getFormData (type) {
@@ -98,14 +97,14 @@ export default {
       if (type === 'add') {
         return {
           title: this.saveData.title,
-          message_id: this.saveData.message_id,
-          send_server_id: this.saveData.send_server_id,
-          receive: this.saveData.receive
+          receive_server_id: this.saveData.receive_server_id,
+          receive_rule: this.saveData.receive_rule,
+          end_type: this.saveData.end_type
         }
       } else {
         return {
           id: this.saveData.id,
-          send_server_id: this.saveData.send_server_id
+          receive_server_id: this.saveData.receive_server_id
         }
       }
     },
@@ -120,7 +119,7 @@ export default {
         totalRow: response.result.totalCount // 总条目数（分页用）
       }
     },
-    smtpFormatResult (response) {
+    imapFormatResult (response) {
       console.log('format', response)
       const listTemp = []
       for (let i = 0; i < response.result.data.length; i++) {
@@ -141,32 +140,32 @@ export default {
       this.keywords = keywords
       // this.SearchMessageList(keywords, 1)
     },
-    getSmtpList () {
+    getImapList () {
       if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
         const con = RequestConFactory(this.selectSendInfo)
-        getSmtpServerList(con, {})
+        getImapAllServerCon(con, {})
           .then(res => {
             console.log(res)
             if (res.status === 200) {
               if (res.result.data !== null) {
                 const listTemp = []
                 for (let i = 0; i < res.result.data.length; i++) {
-                  listTemp.push({ id: res.result.data[i].id, name: res.result.data[i].name })
+                  listTemp.push({ id: res.result.data[i].id, name: res.result.data[i].title })
                 }
                 // this.total = res.result.totalCount
-                this.smtpList = listTemp
+                this.imapList = listTemp
                 // this.messageListInfo = { list: res.result.data, total: res.result.totalPage, page: res.result.pageNo, size: res.result.pageSize }
               } else {
-                this.smtpList = []
+                this.imapList = []
               }
             } else if (res.status === 401) {
-              this.smtpList = []
+              this.imapList = []
             } else {
-              this.smtpList = []
+              this.imapList = []
             }
           })
       } else {
-        this.smtpList = []
+        this.imapList = []
       }
     },
     SearchMessageList (keywords, pageNo) {
@@ -221,7 +220,7 @@ export default {
       }
     }
     return {
-      saveData: {},
+      saveData: { end_type: '0' },
       messageListPath: superSendApi.GetMessageList,
       smtpServerListPath: superSendApi.GetSmtpServerList,
       selectedValue: null, // 用于绑定选择的值
@@ -241,7 +240,7 @@ export default {
       attrCount: 0,
       isEditingAttach: false,
       serverIds: null,
-      smtpList: [],
+      imapList: [],
       messageSelectPage: {},
       serverSelectPage: {}
     }
@@ -258,19 +257,19 @@ export default {
       // this.model && this.form.setFieldsValue(pick(this.model, fields))
       this.saveData.title = ''
       this.saveData.id = 0
-      this.saveData.message_id = ''
-      this.saveData.send_server_id = ''
-      this.saveData.receive = ''
+      this.saveData.receive_rule = ''
+      this.saveData.receive_server_id = ''
+      this.saveData.receive_model = ''
+      this.saveData.status = ''
       if (!this.model) {
-        this.$refs.messageSelectPage.remove()
         this.$refs.serverSelectPage.remove()
       }
-      console.log('model', this.model)
+      console.log('model3', this.model)
       if (this.model && this.model.id > 0) {
         this.saveData.title = this.model.title
         this.saveData.id = this.model.id
         // this.saveData.message_id = String(this.model.message_id)
-        this.saveData.send_server_id = String(this.model.send_server_id)
+        this.saveData.receive_server_id = String(this.model.receive_server_id)
         console.log('saveData', this.saveData)
       }
     })
