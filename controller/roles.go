@@ -80,7 +80,16 @@ func GetRolesList(c *gin.Context) {
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	res, err := client.GetList(ctx, &proto.RolesLisRequest{SearchKey: rolesRequest.KeyWords, Page: int64(rolesRequest.PageNo), PageSize: int64(rolesRequest.PageSize)})
 	if err != nil {
-		ResponseFailed(c, nil, err.Error())
+		statusErr, ok := status.FromError(err)
+		if ok {
+			switch statusErr.Code() {
+			case codes.Unauthenticated:
+				ResponseNotAuth(c, nil, statusErr.Message())
+			// 其他状态码...
+			default:
+				ResponseFailed(c, nil, statusErr.Message())
+			}
+		}
 		return
 	} else {
 		if res.Code == 1 {

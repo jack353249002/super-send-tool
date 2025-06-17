@@ -4,7 +4,9 @@ import (
 	"context"
 	"github.com/gin-gonic/gin"
 	"github.com/golang/protobuf/ptypes/empty"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 	"super-send-tool/grpccons"
 	"super-send-tool/model/request"
 	"super-send-tool/proto"
@@ -79,7 +81,16 @@ func GetSendInfoList(c *gin.Context) {
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	res, err := client.GetSendInfoList(ctx, &proto.GetSendInfoListRequest{Page: int64(getSendInfoListRequest.PageNo), Limit: int64(getSendInfoListRequest.PageSize), Status: int64(getSendInfoListRequest.Status)})
 	if err != nil {
-		ResponseFailed(c, nil, err.Error())
+		statusErr, ok := status.FromError(err)
+		if ok {
+			switch statusErr.Code() {
+			case codes.Unauthenticated:
+				ResponseNotAuth(c, nil, statusErr.Message())
+			// 其他状态码...
+			default:
+				ResponseFailed(c, nil, statusErr.Message())
+			}
+		}
 		return
 	} else {
 		if res.Code == 1 {
@@ -119,7 +130,16 @@ func GetSendList(c *gin.Context) {
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	res, err := client.GetSendList(ctx, &proto.GetSendListRequest{Page: int64(getSendListRequest.PageNo), Limit: int64(getSendListRequest.PageSize), Status: int64(getSendListRequest.Status), SendId: int64(getSendListRequest.SendID)})
 	if err != nil {
-		ResponseFailed(c, nil, err.Error())
+		statusErr, ok := status.FromError(err)
+		if ok {
+			switch statusErr.Code() {
+			case codes.Unauthenticated:
+				ResponseNotAuth(c, nil, statusErr.Message())
+			// 其他状态码...
+			default:
+				ResponseFailed(c, nil, statusErr.Message())
+			}
+		}
 		return
 	} else {
 		if res.Code == 1 {

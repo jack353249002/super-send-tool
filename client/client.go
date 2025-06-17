@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"log"
@@ -70,11 +71,15 @@ func (c *Client) GetUserInfoCacheAll() (res []*UserCacheInfo) {
 	})
 	return
 }
-func (c *Client) Init(con *grpccons.SuperSend) error {
+func (c *Client) Init(con *grpccons.SuperSend) (err error) {
+	defer func() {
+		if r := recover(); r != nil {
+			err = errors.New(r.(string))
+		}
+	}()
 	c.SuperSend = con
 	c.UsersServerClient = proto.NewUsersServiceClient(c.SuperSend.Conn)
 	ctx := context.Background()
-	var err error
 	c.Stream, err = c.UsersServerClient.MessageSend(ctx)
 	return err
 }
@@ -158,6 +163,11 @@ func (c *Client) listenMessageAction(signal ClientSignal) {
 	}
 }
 func (c *Client) ListenMessage() {
+	defer func() {
+		if r := recover(); r != nil {
+			log.Println(r)
+		}
+	}()
 	var signal ClientSignal
 	signal = make(ClientSignal)
 	autoLogin := false
