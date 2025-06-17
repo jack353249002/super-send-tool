@@ -250,8 +250,10 @@ export default {
                   return Promise.resolve({ data: [], total: 0 })
                 }
               } else if (res.status === 401) {
+                this.$message.error(res.message)
                 return Promise.resolve({ data: [], total: 0 })
               } else {
+                this.$message.error(res.message)
                 return Promise.resolve({ data: [], total: 0 })
               }
             })
@@ -382,10 +384,9 @@ export default {
               const con = RequestConFactory(this.selectSendInfo)
               setReceiveCon(con, formData).then(res => {
                 if (res.status === 200) {
+                  this.$refs.createModal.resetFields()
                   this.visible = false
                   this.confirmLoading = false
-                  // 重置表单数据
-                  form.resetFields()
                   // 刷新表格
                   this.$refs.table.refresh()
 
@@ -403,10 +404,9 @@ export default {
               const con = RequestConFactory(this.selectSendInfo)
               addReceive(con, formData).then(res => {
                 if (res.status === 200) {
+                  this.$refs.createModal.resetFields()
                   this.visible = false
                   this.confirmLoading = false
-                  // 重置表单数据
-                  form.resetFields()
                   // 刷新表格
                   this.$refs.table.refresh()
 

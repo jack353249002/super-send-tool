@@ -92,6 +92,10 @@ export default {
     this.getImapList()
   },
   methods: {
+    resetFields () {
+      this.saveData.send_server_id = null
+      this.saveData = { }
+    },
     getFormData (type) {
       // 返回表单数据
       if (type === 'add') {

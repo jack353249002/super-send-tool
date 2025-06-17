@@ -36,6 +36,7 @@ export const superSendApi = {
   GetImapServer: '/super_send/getImapServer',
   SetImapServer: '/super_send/setImapServer',
   DelImapServer: '/super_send/delImapServer',
+  ReloadImap: '/super_send/reloadImapServer',
   GetImapAllServer: '/super_send/getImapServerAllList',
   GetServerUsers: '/super_send/getUsers',
   GetServerUserInfo: '/super_send/getUserInfo',
@@ -327,6 +328,13 @@ export function delImapServerCon (con, id) {
     url: superSendApi.DelImapServer,
     method: 'post',
     data: { 'id': Number(id) }
+  })
+}
+export function reloadImapCon (con) {
+  return con.request({
+    url: superSendApi.ReloadImap,
+    method: 'post',
+    data: { }
   })
 }
 export function getImapAllServerCon (con, parameter) {

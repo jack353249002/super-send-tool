@@ -137,6 +137,9 @@ export default {
     })
   },
   methods: {
+    resetFields () {
+      this.saveData = {}
+    },
     getFormData () {
       // 获取编辑器内容
       const editorContent = this.$refs.myQuillEditor.quill.root.innerHTML
@@ -215,7 +218,7 @@ export default {
       }
     }
     return {
-      saveData: {},
+      saveData: { 'content_type': 'text/html' },
       form: this.$form.createForm(this),
       width: 500,
       height: 500,

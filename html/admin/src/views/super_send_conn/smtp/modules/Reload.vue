@@ -7,6 +7,7 @@
     :confirmLoading="loading"
     class="draggable-modal"
     ref="headerUploadRef"
+    :footer="null"
     @ok="() => { $emit('ok') }"
     @cancel="() => { $emit('cancel') }"
   >

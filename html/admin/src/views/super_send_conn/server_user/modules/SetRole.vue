@@ -5,6 +5,7 @@
     wrap-class-name="full-modal"
     :visible="visible"
     :confirmLoading="loading"
+    :footer="false"
     class="draggable-modal"
     ref="headerUploadRef"
     @ok="() => { $emit('ok') }"
@@ -57,34 +58,16 @@ export default {
   watch: {
     selectSendInfo: {
       handler (newVal, oldVal) {
-        this.getUserInfo(newVal.id)
+        console.log('newVal', newVal)
+        if (newVal != null) {
+          this.initLoad(newVal.id)
+        }
       },
       deep: true // 深度监听
     },
     rolestr: {
       handler (newVal, oldVal) {
-        // 将 rolestr 拆分为数组
-        console.log('rolestr-in', newVal)
-        console.log('rolestr-in2', typeof oldVal)
-        const newRoleArray = newVal ? newVal.split(',') : []
-        const oldRoleArray = oldVal ? oldVal.split(',') : []
-        console.log('newRoleArray', newRoleArray)
-        console.log('oldRoleArray', oldRoleArray)
-        console.log('firstIn', this.firstIn)
-        if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined && this.model.id !== 0 && this.needRequest) {
-          const con = RequestConFactory(this.selectSendInfo)
-          // 找出新增的元素
-          const addedRoles = newRoleArray.filter(role => !oldRoleArray.includes(role))
-          for (const role of addedRoles) {
-            addServerRolesFroUserCon(con, { 'role': role, 'username': this.model.username })
-          }
-          // 找出减少的元素
-          const removedRoles = oldRoleArray.filter(role => !newRoleArray.includes(role))
-          for (const role of removedRoles) {
-            delServerUserRoleCon(con, { 'role': role, 'username': this.model.username })
-          }
-        }
-        this.needRequest = true
+        this.rolestrChange(oldVal, newVal)
       },
       deep: true
     }
@@ -110,16 +93,55 @@ export default {
   mounted () {
   },
   methods: {
+    setRoleStr (newVal) {
+      var oldVal = this.rolestr
+      if (oldVal === newVal) {
+        this.rolestrChange(oldVal, newVal)
+      } else {
+        this.rolestr = newVal
+      }
+    },
+    rolestrChange (oldVal, newVal) {
+      // 将 rolestr 拆分为数组
+      console.log('rolestr-in', newVal)
+      console.log('rolestr-in2', typeof oldVal)
+      console.log('rolestr-in3', this.needRequest)
+      const newRoleArray = newVal ? newVal.split(',') : []
+      const oldRoleArray = oldVal ? oldVal.split(',') : []
+      console.log('newRoleArray', newRoleArray)
+      console.log('oldRoleArray', oldRoleArray)
+      console.log('firstIn', this.firstIn)
+      if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined && this.model != null && this.model.id !== 0 && this.needRequest) {
+        const con = RequestConFactory(this.selectSendInfo)
+        // 找出新增的元素
+        const addedRoles = newRoleArray.filter(role => !oldRoleArray.includes(role))
+        for (const role of addedRoles) {
+          addServerRolesFroUserCon(con, { 'role': role, 'username': this.model.username })
+        }
+        // 找出减少的元素
+        const removedRoles = oldRoleArray.filter(role => !newRoleArray.includes(role))
+        for (const role of removedRoles) {
+          delServerUserRoleCon(con, { 'role': role, 'username': this.model.username })
+        }
+      }
+      this.needRequest = true
+      console.log('rolestr-in4', this.needRequest)
+    },
     getFormData (type) {
 
+    },
+    isNeedRequest () {
+      this.needRequest = true
     },
     clearSelectPage () {
       this.needRequest = false
       this.model.id = 0
-      this.rolestr = null
+      this.setRoleStr('')
+    },
+    initLoad (id) {
+      this.getRoles(id, true)
     },
     getUserInfo (id) {
-      this.getRoles()
       if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
         const con = RequestConFactory(this.selectSendInfo)
         getServerUserInfoCon(con, { id: id }).then(res => {
@@ -127,11 +149,12 @@ export default {
           if (res.status === 200) {
             if (res.result.roles != null) {
               this.needRequest = false
-              this.rolestr = res.result.roles.join(',')
+              this.setRoleStr(res.result.roles.join(','))
             }
             console.log('rolestr', this.rolestr)
           } else {
-            this.rolestr = ''
+            this.needRequest = false
+            this.setRoleStr('')
           }
         })
       }
@@ -168,7 +191,7 @@ export default {
       this.keywords = keywords
       // this.SearchMessageList(keywords, 1)
     },
-    getRoles () {
+    getRoles (id, getUser) {
       if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
         console.log('getRoles')
         const con = RequestConFactory(this.selectSendInfo)
@@ -183,6 +206,9 @@ export default {
                 }
                 // this.total = res.result.totalCount
                 this.roleList = listTemp
+                if (getUser) {
+                  this.getUserInfo(id)
+                }
                 // this.messageListInfo = { list: res.result.data, total: res.result.totalPage, page: res.result.pageNo, size: res.result.pageSize }
               } else {
                 this.roleList = []
@@ -286,7 +312,7 @@ export default {
     this.$watch('model', () => {
       if (this.model && this.model.id > 0) {
         console.log('model', this.model)
-          this.getUserInfo(this.model.id)
+          this.initLoad(this.model.id)
       }
     })
   }

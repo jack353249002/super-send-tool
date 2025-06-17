@@ -5,6 +5,7 @@
     wrap-class-name="full-modal"
     :visible="visible"
     :confirmLoading="loading"
+    :footer="false"
     class="draggable-modal"
     ref="headerUploadRef"
     @cancel="() => { $emit('cancel') }"

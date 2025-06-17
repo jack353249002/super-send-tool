@@ -19,6 +19,7 @@
     </div>
     <div class="table-operator">
       <a-button type="primary" icon="plus" @click="handleAdd">新建</a-button>
+      <a-button type="primary" @click="showReload">更新配置</a-button>
       <a-dropdown v-action:edit v-if="selectedRowKeys.length > 0">
         <a-menu slot="overlay">
           <a-menu-item key="1"><a-icon type="delete" />删除</a-menu-item>
@@ -98,7 +99,7 @@
 import { STable } from '@/components'
 import {
   delImapServerCon,
-  getImapServerCon,
+  getImapServerCon, reloadImapCon,
   RequestConFactory, sendInfoActionCon, setImapServerCon,
   setSuperSendOnline
 } from '@/api/super_send'
@@ -217,8 +218,10 @@ export default {
                   return Promise.resolve({ data: [], total: 0 })
                 }
               } else if (res.status === 401) {
+                this.$message.error(res.message)
                 return Promise.resolve({ data: [], total: 0 })
               } else {
+                this.$message.error(res.message)
                 return Promise.resolve({ data: [], total: 0 })
               }
             })
@@ -355,8 +358,16 @@ export default {
       })
     },
     showReload () {
-      this.reloadVisible = true
-      this.$refs.reloadModal.ReloadStart('')
+      if (this.selectSendInfo !== undefined && this.selectSendInfo.token !== '' && this.selectSendInfo.id !== 0 && this.selectSendInfo.id !== undefined) {
+        const con = RequestConFactory(this.selectSendInfo)
+        reloadImapCon(con).then(res => {
+          if (res.status === 200) {
+            this.$message.success(res.message)
+          } else {
+            this.$message.error(res.message)
+          }
+        })
+      }
     },
     reloadHandleCancel () {
       this.reloadVisible = false

@@ -193,8 +193,10 @@ export default {
                   return Promise.resolve({ data: [], total: 0 })
                 }
               } else if (res.status === 401) {
+                this.$message.error(res.message)
                 return Promise.resolve({ data: [], total: 0 })
               } else {
+                this.$message.error(res.message)
                 return Promise.resolve({ data: [], total: 0 })
               }
             })
@@ -272,6 +274,7 @@ export default {
       this.mdlSetUserPassword = { ...record }
     },
     handelSetRole (record) {
+      this.$refs.setRoleModal.setRoleStr(record.rolestr)
       this.visibleSetRole = true
       this.mdlSetRole = { ...record }
     },
@@ -371,8 +374,8 @@ export default {
     },
     handleRoleCancel () {
       this.visibleSetRole = false
-      const form = this.$refs.setRoleModal.form
-      form.resetFields() // 清理表单数据（可不做）
+      // const form = this.$refs.setRoleModal.form
+      // form.resetFields() // 清理表单数据（可不做）
       this.$refs.setRoleModal.clearSelectPage()
     },
     onSelectChange (selectedRowKeys, selectedRows) {

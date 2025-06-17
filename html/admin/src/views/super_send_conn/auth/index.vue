@@ -156,8 +156,10 @@ export default {
                   return Promise.resolve({ data: [], total: 0 })
                 }
               } else if (res.status === 401) {
+                this.$message.error(res.message)
                 return Promise.resolve({ data: [], total: 0 })
               } else {
+                this.$message.error(res.message)
                 return Promise.resolve({ data: [], total: 0 })
               }
             })

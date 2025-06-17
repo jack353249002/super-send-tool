@@ -173,8 +173,10 @@ export default {
                   return Promise.resolve({ data: [], total: 0 })
                 }
               } else if (res.status === 401) {
+                this.$message.error(res.message)
                 return Promise.resolve({ data: [], total: 0 })
               } else {
+                this.$message.error(res.message)
                 return Promise.resolve({ data: [], total: 0 })
               }
             })
@@ -263,7 +265,7 @@ export default {
                 this.visible = false
                 this.confirmLoading = false
                 // 重置表单数据
-                form.resetFields()
+                this.$refs.createModal.resetFields()
                 // 刷新表格
                 this.$refs.table.refresh()
 
@@ -282,7 +284,7 @@ export default {
                   this.visible = false
                   this.confirmLoading = false
                   // 重置表单数据
-                  form.resetFields()
+                  this.$refs.createModal.resetFields()
                   // 刷新表格
                   this.$refs.table.refresh()
 
