@@ -63,6 +63,7 @@ type SetSendRequest struct {
 	SendServerID  string `json:"send_server_id" binding:"required"`
 	DispatchModel uint32 `json:"dispatch_model"`
 	Receive       string `json:"receive" binding:"required"`
+	Params        string `json:"params"`
 }
 type GetSendInfoListRequest struct {
 	PageListRequest
@@ -83,7 +84,8 @@ type SetSendInfoRequest struct {
 	MessageID     int64  `json:"message_id" binding:"required"`
 	CreateTime    int64  `json:"create_time"`
 	SendModel     uint32 `json:"send_model" binding:"required"`*/
-	SendServerID string `json:"send_server_id" binding:"required"`
+	SendServerID string `json:"send_server_id"`
+	Params       string `json:"params"`
 	/*DispatchModel uint32 `json:"dispatch_model" binding:"required"`
 	Receive       string `json:"receive" binding:"required"`*/
 }

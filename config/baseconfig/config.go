@@ -32,6 +32,7 @@ func init() {
 	// 获取配置项的值
 	CONFIG.Host = viper.GetString("SERVER_HOST")
 	CONFIG.Debug = viper.GetBool("SERVER_DEBUG")
+	CONFIG.OpenSSL = viper.GetBool("OPENSSL")
 	CONFIG.ServerPublicKey = viper.GetString("SERVER_SERVERPUBLICKEY")
 	CONFIG.ServerPrivateKey = viper.GetString("SERVER_SERVERPRIVATEKEY")
 	CONFIG.DBPath = viper.GetString("DB_PATH")
@@ -45,6 +46,7 @@ func init() {
 
 type Config struct {
 	Host                 string //监听地址
+	IsSSL                bool
 	Debug                bool
 	ServerPublicKey      string
 	ServerPrivateKey     string

@@ -40,7 +40,7 @@ func SetSend(c *gin.Context) {
 	defer cancel()
 	ctx = metadata.NewOutgoingContext(ctx, md)
 	res, err := client.SetSend(ctx, &proto.AddSendRequest{Title: setSendRequest.Title, Receive: setSendRequest.Receive, MessageId: setSendRequest.MessageID,
-		SendModel: setSendRequest.SendModel, DispatchModel: setSendRequest.DispatchModel, SendServerId: setSendRequest.SendServerID})
+		SendModel: setSendRequest.SendModel, DispatchModel: setSendRequest.DispatchModel, SendServerId: setSendRequest.SendServerID, Params: setSendRequest.Params})
 	if err != nil {
 		ResponseFailed(c, nil, err.Error())
 		return
@@ -216,7 +216,13 @@ func SetSendInfo(c *gin.Context) {
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
 	ctx = metadata.NewOutgoingContext(ctx, md)
-	res, err := client.SetSendInfo(ctx, &proto.EditSendRequest{Id: setSendInfoRequest.ID, SendServerId: setSendInfoRequest.SendServerID})
+	if setSendInfoRequest.SendServerID == "" {
+		setSendInfoRequest.SendServerID = "#"
+	}
+	if setSendInfoRequest.Params == "" {
+		setSendInfoRequest.Params = "#"
+	}
+	res, err := client.SetSendInfo(ctx, &proto.EditSendRequest{Id: setSendInfoRequest.ID, SendServerId: setSendInfoRequest.SendServerID, Params: setSendInfoRequest.Params})
 	if err != nil {
 		ResponseFailed(c, nil, err.Error())
 		return

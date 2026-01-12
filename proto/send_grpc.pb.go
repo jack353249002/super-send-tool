@@ -21,6 +21,7 @@ const _ = grpc.SupportPackageIsVersion7
 
 const (
 	SendService_SetSend_FullMethodName           = "/super_send.SendService/SetSend"
+	SendService_ResetSend_FullMethodName         = "/super_send.SendService/ResetSend"
 	SendService_SendInfo_FullMethodName          = "/super_send.SendService/SendInfo"
 	SendService_GetSendInfoList_FullMethodName   = "/super_send.SendService/GetSendInfoList"
 	SendService_GetSendList_FullMethodName       = "/super_send.SendService/GetSendList"
@@ -35,6 +36,8 @@ const (
 type SendServiceClient interface {
 	// 设置发送规则
 	SetSend(ctx context.Context, in *AddSendRequest, opts ...grpc.CallOption) (*SendResponse, error)
+	// 重置发送器(一般用于一个发送器已经处理完成后，所有内部运行状态恢复为未启用状态)
+	ResetSend(ctx context.Context, in *EditSendRequest, opts ...grpc.CallOption) (*SendResponse, error)
 	// 获取发送规则详情
 	SendInfo(ctx context.Context, in *SendInfoRequest, opts ...grpc.CallOption) (*SendInfoResponse, error)
 	// 获取发送规则列表
@@ -60,6 +63,15 @@ func NewSendServiceClient(cc grpc.ClientConnInterface) SendServiceClient {
 func (c *sendServiceClient) SetSend(ctx context.Context, in *AddSendRequest, opts ...grpc.CallOption) (*SendResponse, error) {
 	out := new(SendResponse)
 	err := c.cc.Invoke(ctx, SendService_SetSend_FullMethodName, in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *sendServiceClient) ResetSend(ctx context.Context, in *EditSendRequest, opts ...grpc.CallOption) (*SendResponse, error) {
+	out := new(SendResponse)
+	err := c.cc.Invoke(ctx, SendService_ResetSend_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
@@ -126,6 +138,8 @@ func (c *sendServiceClient) GetSmtpServerList(ctx context.Context, in *empty.Emp
 type SendServiceServer interface {
 	// 设置发送规则
 	SetSend(context.Context, *AddSendRequest) (*SendResponse, error)
+	// 重置发送器(一般用于一个发送器已经处理完成后，所有内部运行状态恢复为未启用状态)
+	ResetSend(context.Context, *EditSendRequest) (*SendResponse, error)
 	// 获取发送规则详情
 	SendInfo(context.Context, *SendInfoRequest) (*SendInfoResponse, error)
 	// 获取发送规则列表
@@ -147,6 +161,9 @@ type UnimplementedSendServiceServer struct {
 
 func (UnimplementedSendServiceServer) SetSend(context.Context, *AddSendRequest) (*SendResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetSend not implemented")
+}
+func (UnimplementedSendServiceServer) ResetSend(context.Context, *EditSendRequest) (*SendResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method ResetSend not implemented")
 }
 func (UnimplementedSendServiceServer) SendInfo(context.Context, *SendInfoRequest) (*SendInfoResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SendInfo not implemented")
@@ -193,6 +210,24 @@ func _SendService_SetSend_Handler(srv interface{}, ctx context.Context, dec func
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
 		return srv.(SendServiceServer).SetSend(ctx, req.(*AddSendRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _SendService_ResetSend_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(EditSendRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(SendServiceServer).ResetSend(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: SendService_ResetSend_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(SendServiceServer).ResetSend(ctx, req.(*EditSendRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
@@ -315,6 +350,10 @@ var SendService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "SetSend",
 			Handler:    _SendService_SetSend_Handler,
+		},
+		{
+			MethodName: "ResetSend",
+			Handler:    _SendService_ResetSend_Handler,
 		},
 		{
 			MethodName: "SendInfo",

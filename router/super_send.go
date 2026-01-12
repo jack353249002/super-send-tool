@@ -106,4 +106,12 @@ func SuperSendRouter(r *gin.Engine) {
 		v1.POST("/delRolesPermissions", controller.DelRolesPermissions)
 		v1.POST("/delUserRole", controller.DelRoleForUser)
 	}
+	checkAlive := r.Group("/check_alive")
+	{
+		checkAlive.POST("/create", controller.CreateCheckUserAlive)
+		checkAlive.POST("/set", controller.SetCheckUserAlive)
+		checkAlive.POST("/del", controller.DelCheckUserAlive)
+		checkAlive.POST("/list", controller.CheckUserAliveList)
+		checkAlive.POST("/ping", controller.CheckUserAlivePing)
+	}
 }
