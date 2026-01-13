@@ -50,10 +50,16 @@ export const constantRouterMap = [
             name: 'super_send_users',
             component: () => import('@/views/super_send/users'),
             meta: { title: '节点列表', keepAlive: true, permission: [] }
+          },
+          {
+            path: '/super_send/check_user_alive',
+            name: 'check_user_alive',
+            component: () => import('@/views/super_send/user_alive'),
+            meta: { title: '用户生命检测', keepAlive: true, permission: [] }
           }
         ]
-      },
-      {
+      }
+      /* {
         path: '/etcd_bridge',
         name: 'etcd_bridge',
         component: RouteView,
@@ -67,7 +73,7 @@ export const constantRouterMap = [
             meta: { title: '节点列表', keepAlive: true, permission: [] }
           }
         ]
-      }
+      } */
     ]
   },
   {

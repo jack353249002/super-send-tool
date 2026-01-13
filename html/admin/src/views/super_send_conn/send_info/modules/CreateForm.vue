@@ -49,6 +49,9 @@
         <a-form-item label="接收者账号(逗号分割)" v-show="!model">
           <a-input v-model="saveData.receive" />
         </a-form-item>
+        <a-form-item label="参数(json{变量名:变量值})">
+          <a-input v-model="saveData.params" />
+        </a-form-item>
       </a-form>
     </a-spin>
   </a-modal>
@@ -96,6 +99,7 @@ export default {
     resetFields () {
       this.saveData.send_server_id = null
       this.saveData.message_id = null
+      this.saveData.params = null
       this.saveData = {}
     },
     getFormData (type) {
@@ -105,12 +109,14 @@ export default {
           title: this.saveData.title,
           message_id: this.saveData.message_id,
           send_server_id: this.saveData.send_server_id,
+          params: this.saveData.params,
           receive: this.saveData.receive
         }
       } else {
         return {
           id: this.saveData.id,
-          send_server_id: this.saveData.send_server_id
+          send_server_id: this.saveData.send_server_id,
+          params: this.saveData.params
         }
       }
     },
@@ -226,7 +232,7 @@ export default {
       }
     }
     return {
-      saveData: {},
+      saveData: { },
       messageListPath: superSendApi.GetMessageList,
       smtpServerListPath: superSendApi.GetSmtpServerList,
       selectedValue: null, // 用于绑定选择的值
@@ -266,6 +272,7 @@ export default {
       this.saveData.message_id = ''
       this.saveData.send_server_id = ''
       this.saveData.receive = ''
+      this.saveData.params = ''
       if (!this.model) {
         this.$refs.messageSelectPage.remove()
         this.$refs.serverSelectPage.remove()
@@ -276,6 +283,7 @@ export default {
         this.saveData.id = this.model.id
         // this.saveData.message_id = String(this.model.message_id)
         this.saveData.send_server_id = String(this.model.send_server_id)
+        this.saveData.params = String(this.model.params)
         console.log('saveData', this.saveData)
       }
     })

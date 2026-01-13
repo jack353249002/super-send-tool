@@ -141,6 +141,10 @@ const columns = [
     dataIndex: 'success_count'
   },
   {
+    title: '参数',
+    dataIndex: 'params'
+  },
+  {
     title: '状态',
     dataIndex: 'status',
     scopedSlots: { customRender: 'statusBox' }
@@ -324,6 +328,9 @@ export default {
       this.visible = true
     },
     handleEdit (record) {
+      if (record.params == null) {
+          record.params = ''
+      }
       console.log('record', record)
       this.visible = true
       this.mdl = { ...record }

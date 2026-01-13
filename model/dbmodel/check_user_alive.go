@@ -17,6 +17,17 @@ type CheckUserAlive struct {
 	Salt                   string `json:"salt" gorm:"column:salt"`
 	SuperSendConnInfoId    int    `json:"super_send_conn_info_id" gorm:"column:super_send_conn_info_id"`
 }
+type CheckUserAliveJoinConnInfo struct {
+	ID                       int    `json:"id" gorm:"column:id"`
+	Username                 string `json:"username" gorm:"column:username"`
+	Password                 string `json:"password" gorm:"column:password"`
+	DayLoginFirstTime        int    `json:"day_login_first_time" gorm:"column:day_login_first_time"`
+	SendID                   int    `json:"send_id" gorm:"column:send_id"`
+	SendEmailActionTimeout   int    `json:"send_email_action_timeout" gorm:"column:send_email_action_timeout"`
+	Salt                     string `json:"salt" gorm:"column:salt"`
+	SuperSendConnInfoId      int    `json:"super_send_conn_info_id" gorm:"column:super_send_conn_info_id"`
+	SuperSendConnInfoAddress string `json:"super_send_conn_info_address" gorm:"column:super_send_conn_info_address"`
+}
 
 func (m *CheckUserAlive) TableName() string {
 	return "check_user_alive"
@@ -66,6 +77,15 @@ func (d *CheckUserAliveDao) Get(ctx context.Context, fields, where string, args 
 func (d *CheckUserAliveDao) List(ctx context.Context, fields, where string, offset, limit interface{}, args ...interface{}) ([]CheckUserAlive, error) {
 	var results []CheckUserAlive
 	err := d.replicaDB[rand.Intn(len(d.replicaDB))].Model(d.m).
+		Select(fields).Where(where, args...).Offset(offset.(int)).Limit(limit.(int)).Find(&results).Error
+	if err != nil {
+		return nil, fmt.Errorf("CheckUserAliveDao: List where=%s: %w", where, err)
+	}
+	return results, nil
+}
+func (d *CheckUserAliveDao) ListLeftJoinSuperSendInfo(ctx context.Context, fields, where string, offset, limit interface{}, args ...interface{}) ([]CheckUserAliveJoinConnInfo, error) {
+	var results []CheckUserAliveJoinConnInfo
+	err := d.replicaDB[rand.Intn(len(d.replicaDB))].Model(d.m).Joins("LEFT JOIN super_send_conn_info ON super_send_conn_info.id = check_user_alive.super_send_conn_info_id").
 		Select(fields).Where(where, args...).Offset(offset.(int)).Limit(limit.(int)).Find(&results).Error
 	if err != nil {
 		return nil, fmt.Errorf("CheckUserAliveDao: List where=%s: %w", where, err)

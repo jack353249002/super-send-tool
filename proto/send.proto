@@ -78,6 +78,7 @@ message GetSendInfoList{
     uint32 success_count=10; //发送成功数
     string message_title=11;//消息标题
     string send_server_text=13;//发送服务标题
+    string params =14;
 }
 //发送规则列表响应
 message GetSendInfoListResponse{

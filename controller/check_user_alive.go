@@ -32,7 +32,7 @@ func CreateCheckUserAlive(c *gin.Context) {
 			return
 		}
 		userRequest.Password = utils.MD5(userRequest.Password, salt)
-		err = dao.Create(c, &dbmodel.CheckUserAlive{Salt: salt, Username: userRequest.Username, Password: userRequest.Password, DayLoginFirstTime: userRequest.DayLoginFirstTime, SendID: userRequest.SendID, SendEmailActionTimeout: userRequest.SendEmailActionTimeout})
+		err = dao.Create(c, &dbmodel.CheckUserAlive{Salt: salt, Username: userRequest.Username, Password: userRequest.Password, DayLoginFirstTime: userRequest.DayLoginFirstTime, SendID: userRequest.SendID, SendEmailActionTimeout: userRequest.SendEmailActionTimeout, SuperSendConnInfoId: int(userRequest.SuperSendConnInfoID)})
 		if err != nil {
 			ResponseFailed(c, nil, err.Error())
 			return
@@ -77,6 +77,7 @@ func SetCheckUserAlive(c *gin.Context) {
 		saveData["day_login_first_time"] = userRequest.DayLoginFirstTime
 		saveData["send_id"] = userRequest.SendID
 		saveData["send_email_action_timeout"] = userRequest.SendEmailActionTimeout
+		saveData["super_send_conn_info_id"] = userRequest.SuperSendConnInfoID
 		if userRequest.Password != "" {
 			saveData["password"] = utils.MD5(userRequest.Password, oldUser.Salt)
 		}
@@ -134,10 +135,10 @@ func CheckUserAliveList(c *gin.Context) {
 	where := "1=@val"
 	params := map[string]interface{}{"val": 1}
 	if pageListRequest.KeyWords != "" {
-		where += " AND ( username LIKE @keywords) "
+		where += " AND ( check_user_alive.username LIKE @keywords) "
 		params["keywords"] = "%" + pageListRequest.KeyWords + "%"
 	}
-	list, err := dao.List(c, "*", where, offset, int(pageListRequest.PageSize), params)
+	list, err := dao.ListLeftJoinSuperSendInfo(c, "check_user_alive.*,super_send_conn_info.address as super_send_conn_info_address", where, offset, int(pageListRequest.PageSize), params)
 	count, err := dao.Count(c, "id", where, params)
 	if err != nil {
 		ResponseFailed(c, nil, err.Error())

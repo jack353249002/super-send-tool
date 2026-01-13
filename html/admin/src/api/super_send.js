@@ -51,7 +51,11 @@ export const superSendApi = {
   AddRole: '/super_send/addRole',
   DelRole: '/super_send/delRole',
   GetRolesPermissions: '/super_send/getRolesPermissions',
-  DelRolesPermissions: '/super_send/delRolesPermissions'
+  DelRolesPermissions: '/super_send/delRolesPermissions',
+  GetCheckAliveList: '/check_alive/list',
+  CreateCheckAlive: '/check_alive/create',
+  SetCheckAlive: '/check_alive/set',
+  DelCheckAlive: '/check_alive/del'
 }
 export function getOnlineSuperSend () {
   return request({
@@ -457,5 +461,34 @@ export function setReceiveCon (con, parameter) {
     url: superSendApi.SetReceive,
     method: 'post',
     data: parameter
+  })
+}
+export function getCheckAliveList (parameter) {
+  return request({
+    url: superSendApi.GetCheckAliveList,
+    method: 'post',
+    data: parameter
+  })
+}
+export function addCheckAlive (parameter) {
+  return request({
+    url: superSendApi.CreateCheckAlive,
+    method: 'post',
+    data: parameter
+  })
+}
+export function setCheckAlive (parameter) {
+  return request({
+    url: superSendApi.SetCheckAlive,
+    method: 'post',
+    data: parameter
+  })
+}
+
+export function delCheckAlive (id) {
+  return request({
+    url: superSendApi.DelCheckAlive,
+    method: 'post',
+    data: { id: Number(id) }
   })
 }
