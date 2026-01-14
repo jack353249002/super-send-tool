@@ -26,6 +26,10 @@ type SetSuperSendOnlineRequest struct {
 	ID     int   `json:"id" binding:"required"`
 	Online uint8 `json:"online"`
 }
+type LoginToolRequest struct {
+	UserName string `json:"username" binding:"required"`
+	PassWord string `json:"password" binding:"required"`
+}
 type LogOutUserAllDeviceRequest struct {
 	ID int `json:"id" binding:"required"`
 }

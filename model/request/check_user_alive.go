@@ -14,6 +14,7 @@ type CreateUserAliveRequest struct {
 type UserAlivePing struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
+	Position string `json:"position"`
 }
 type DelUserAliveRequest struct {
 	ID int64 `json:"id" binding:"required"`

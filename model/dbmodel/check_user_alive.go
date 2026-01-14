@@ -16,6 +16,7 @@ type CheckUserAlive struct {
 	SendEmailActionTimeout int    `json:"send_email_action_timeout" gorm:"column:send_email_action_timeout"`
 	Salt                   string `json:"salt" gorm:"column:salt"`
 	SuperSendConnInfoId    int    `json:"super_send_conn_info_id" gorm:"column:super_send_conn_info_id"`
+	Position               string `json:"position" gorm:"column:position"`
 }
 type CheckUserAliveJoinConnInfo struct {
 	ID                       int    `json:"id" gorm:"column:id"`

@@ -37,6 +37,8 @@ func init() {
 	CONFIG.ServerPrivateKey = viper.GetString("SERVER_SERVERPRIVATEKEY")
 	CONFIG.DBPath = viper.GetString("DB_PATH")
 	CONFIG.PageSize = viper.GetInt("PAGESIZE")
+	CONFIG.ToolUserName = viper.GetString("TOOL_USERNAME")
+	CONFIG.ToolPassWord = viper.GetString("TOOL_PASSWORD")
 	caPaths := viper.GetString("CA_PATHS")
 	if caPaths != "" {
 		CONFIG.CAPATHS = strings.Split(caPaths, ",")
@@ -65,4 +67,7 @@ type Config struct {
 	PeerClientPublicKey  string
 	PeerClientPrivateKey string
 	CAPATHS              []string
+	ToolUserName         string
+	ToolPassWord         string
+	ToolSecretKey        string
 }

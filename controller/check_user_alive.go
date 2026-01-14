@@ -181,10 +181,11 @@ func CheckUserAlivePing(c *gin.Context) {
 			oldUserTime := time.Unix(int64(user.DayLoginFirstTime), 0)
 			oldUserTimeBegin := time.Date(oldUserTime.Year(), oldUserTime.Month(), oldUserTime.Day(), 0, 0, 0, 0, oldUserTime.Location())
 			if nowDayBegin.Unix() == oldUserTimeBegin.Unix() {
+				dao.Update(c, "id=@id", map[string]interface{}{"position": request.Position, "last_ping_time": nowTime.Unix()}, map[string]interface{}{"id": user.ID})
 				ResponseSuccess(c, nil, "success")
 				return
 			}
-			dao.Update(c, "id=@id", map[string]interface{}{"day_login_first_time": nowTime.Unix()}, map[string]interface{}{"id": user.ID})
+			dao.Update(c, "id=@id", map[string]interface{}{"day_login_first_time": nowDayBegin.Unix(), "position": request.Position, "last_ping_time": nowTime.Unix()}, map[string]interface{}{"id": user.ID})
 			ResponseSuccess(c, nil, "success")
 		}
 	}

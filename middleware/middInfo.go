@@ -3,11 +3,13 @@ package middleware
 import (
 	"github.com/gin-gonic/gin"
 	"strconv"
+	"super-send-tool/config/baseconfig"
 	"super-send-tool/controller"
 	"super-send-tool/db"
 	"super-send-tool/grpccons"
 	"super-send-tool/model/dbmodel"
 	"super-send-tool/proto"
+	"super-send-tool/utils"
 	"time"
 )
 
@@ -20,6 +22,12 @@ var notAuth = map[string]struct{}{
 	"/super_send/updateSuperSend":    {},
 	"/super_send/deleteSuperSend":    {},
 	"/super_send/getSuperSendInfo":   {},
+	"/check_alive/create":            {},
+	"/check_alive/set":               {},
+	"/check_alive/del":               {},
+	"/check_alive/list":              {},
+	"/check_alive/ping":              {},
+	"/super_send/loginTool":          {},
 }
 var notSendID = map[string]struct{}{
 	"/super_send/getSuperSendList":   {},
@@ -29,6 +37,12 @@ var notSendID = map[string]struct{}{
 	"/super_send/updateSuperSend":    {},
 	"/super_send/deleteSuperSend":    {},
 	"/super_send/getSuperSendInfo":   {},
+	"/check_alive/create":            {},
+	"/check_alive/set":               {},
+	"/check_alive/del":               {},
+	"/check_alive/list":              {},
+	"/check_alive/ping":              {},
+	"/super_send/loginTool":          {},
 }
 var notEtcdBridgeAUth = map[string]struct{}{
 	"/etcd_bridge/getEtcdBridgeList": {},
@@ -40,6 +54,27 @@ var notEtcdBridgeID = map[string]struct{}{
 func MiddInfo() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		tokenString := ""
+		toolToken := c.GetHeader("Access-Token")
+		if c.Request.URL.Path != "/super_send/loginTool" && c.Request.URL.Path != "/check_alive/ping" {
+			if toolToken == "" {
+				controller.ResponseNotAuth(c, nil, "Access-Token is required")
+				c.Abort()
+				return
+			} else {
+				cl, err := utils.ValidateToken(toolToken, baseconfig.CONFIG.ToolSecretKey)
+				if err != nil {
+					controller.ResponseNotAuth(c, nil, "Access-Token is invalid")
+					c.Abort()
+					return
+				} else {
+					if !(cl.UserID == 1 && cl.Username == baseconfig.CONFIG.ToolUserName) {
+						controller.ResponseNotAuth(c, nil, "Access-Token error")
+						c.Abort()
+						return
+					}
+				}
+			}
+		}
 		//tokenString := c.GetHeader("Token")
 		superSendID := c.GetHeader("Super_send_id")
 		superSendIDInt, _ := strconv.Atoi(superSendID)

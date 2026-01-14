@@ -46,6 +46,7 @@ func SuperSendRouter(r *gin.Engine) {
 	v1 := r.Group("/super_send")
 	{
 		v1.Use(middleware.MiddInfo())
+		v1.POST("/loginTool", controller.LoginTool)
 		v1.POST("/getSuperSendList", controller.SuperSendList)
 		v1.POST("/getSuperSendInfo", controller.GetSuperSendInfo)
 		v1.POST("/logoutUserAllDevice", controller.LogoutUserAllDevice)
@@ -108,6 +109,7 @@ func SuperSendRouter(r *gin.Engine) {
 	}
 	checkAlive := r.Group("/check_alive")
 	{
+		checkAlive.Use(middleware.MiddInfo())
 		checkAlive.POST("/create", controller.CreateCheckUserAlive)
 		checkAlive.POST("/set", controller.SetCheckUserAlive)
 		checkAlive.POST("/del", controller.DelCheckUserAlive)

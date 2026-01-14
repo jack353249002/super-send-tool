@@ -2,6 +2,7 @@ package cron
 
 import (
 	"context"
+	"encoding/json"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/metadata"
 	"google.golang.org/grpc/status"
@@ -16,7 +17,7 @@ import (
 func SendEmailCron() {
 	for {
 		SendEmail()
-		time.Sleep(10 * time.Minute)
+		time.Sleep(10 * time.Second)
 	}
 }
 func SendEmail() {
@@ -62,11 +63,16 @@ func ResetSend(user *dbmodel.CheckUserAlive) bool {
 	md := metadata.Pairs(
 		"token", con.Token,
 	)
-	conCtx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+	conCtx, cancel := context.WithTimeout(context.Background(), 115*time.Second)
 	defer cancel()
 	outCtx := metadata.NewOutgoingContext(conCtx, md)
+	params := map[string]string{
+		"position": user.Position,
+	}
+	paramsJson, _ := json.Marshal(params)
 	resp, err := client.ResetSend(outCtx, &proto.EditSendRequest{Id: int64(user.SendID)})
 	if err == nil && resp.GetCode() == 1 {
+		resp, err = client.SetSendInfo(outCtx, &proto.EditSendRequest{Id: int64(user.SendID), Params: string(paramsJson)})
 		return true
 	} else if err == nil && resp.GetCode() == 0 {
 		return false
@@ -85,10 +91,11 @@ func ResetSend(user *dbmodel.CheckUserAlive) bool {
 					md = metadata.Pairs(
 						"token", con.Token,
 					)
-					conCtx, _ = context.WithTimeout(context.Background(), 15*time.Second)
+					conCtx, _ = context.WithTimeout(context.Background(), 115*time.Second)
 					outCtx = metadata.NewOutgoingContext(conCtx, md)
 					resp, err = client.ResetSend(outCtx, &proto.EditSendRequest{Id: int64(user.SendID)})
 					if err == nil && resp.GetCode() == 1 {
+						resp, err = client.SetSendInfo(outCtx, &proto.EditSendRequest{Id: int64(user.SendID), Params: string(paramsJson)})
 						return true
 					} else {
 						return false

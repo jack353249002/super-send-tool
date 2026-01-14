@@ -7,6 +7,7 @@ import (
 	"github.com/golang/protobuf/ptypes/empty"
 	"google.golang.org/grpc/metadata"
 	client2 "super-send-tool/client"
+	"super-send-tool/config/baseconfig"
 	"super-send-tool/db"
 	"super-send-tool/grpccons"
 	"super-send-tool/model/dbmodel"
@@ -17,6 +18,31 @@ import (
 	"super-send-tool/validate"
 	"time"
 )
+
+// @Summary 登录tool
+// @Router /super_send/loginTool [POST]
+func LoginTool(c *gin.Context) {
+	var request request.LoginToolRequest
+	err := c.ShouldBind(&request)
+	if err != nil {
+		// 提取验证错误信息
+		errors := validate.SuperSendErrorMessages(err)
+		ResponseFailed(c, nil, validate.GetAllErrorStr(errors))
+		return
+	}
+	if request.UserName == baseconfig.CONFIG.ToolUserName && request.PassWord == baseconfig.CONFIG.ToolPassWord {
+		jwt, err := utils.GenerateToken(1, request.UserName, baseconfig.CONFIG.ToolSecretKey)
+		if err == nil {
+			ResponseSuccess(c, jwt, "success")
+		} else {
+			ResponseFailed(c, nil, "token失效")
+		}
+		return
+	} else {
+		ResponseFailed(c, nil, "用户名或密码错误")
+	}
+	return
+}
 
 // @Summary 连接和断开
 // @Router /super_send/setSuperSendOnline [POST]
