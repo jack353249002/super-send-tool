@@ -163,7 +163,11 @@ export default {
         console.log('loadData request parameters:', requestParameters)
         return getSuperSendList(requestParameters)
           .then(res => {
-            return res.result
+            if (res != null) {
+              return res.result
+            } else {
+              return { data: [], pageSize: 0, total: 0, pageNo: 0, totalPage: 0, totalCount: 0 }
+            }
           })
       },
       selectedRowKeys: [],

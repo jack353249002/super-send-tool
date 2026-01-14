@@ -142,9 +142,11 @@ export default {
 
         if (this.sendID) {
           getSuperSendInfo(this.sendID).then(res => {
-            this.$store.commit(SET_SENDINFO, res.result)
-            // this.nowSendInfo = res.result
-            console.log('aas' + this.nowSendInfo.token)
+            if (res != null) {
+              this.$store.commit(SET_SENDINFO, res.result)
+              // this.nowSendInfo = res.result
+              console.log('aas' + this.nowSendInfo.token)
+            }
           })
         }
       } else {
@@ -192,6 +194,9 @@ export default {
     getThisOnlineSuperSend () {
       getOnlineSuperSend().then(
         res => {
+          if (res == null) {
+            return null
+          }
           const lists = res.result
           const routes = asyncRouterMap.find((item) => item.path === '/')
           routes.children = []

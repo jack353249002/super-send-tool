@@ -11,6 +11,39 @@ const request = axios.create({
   baseURL: process.env.VUE_APP_API_BASE_URL,
   timeout: 6000 // 请求超时时间
 })
+export const createRequest = function () {
+  var requestTool = axios.create({
+    // API 请求的默认前缀
+    baseURL: process.env.VUE_APP_API_BASE_URL,
+    timeout: 6000 // 请求超时时间
+  })
+  // request interceptor
+  requestTool.interceptors.request.use(config => {
+    const token = storage.get(ACCESS_TOKEN)
+    // 如果 token 存在
+    // 让每个请求携带自定义 token 请根据实际情况自行修改
+    if (token) {
+      config.headers['Access-Token'] = token
+    }
+    return config
+  }, errorHandler)
+  requestTool.interceptors.response.use((response) => {
+    // 检查是否需要跳转登录页
+    if (response.data.status === 401) { // 替换为实际的登录过期code值
+      notification.error({
+        message: 'Unauthorized',
+        description: 'Authorization verification failed'
+      })
+      store.dispatch('Logout').then(() => {
+          window.location.href = '/user/login'
+      })
+      return null
+    } else {
+      return response.data
+    }
+  }, errorHandler)
+  return requestTool
+}
 // 创建 axios 实例
 export const createRequestCon = function (superSendInfo) {
   var requestSuperSend = axios.create({
@@ -22,6 +55,10 @@ export const createRequestCon = function (superSendInfo) {
   requestSuperSend.interceptors.request.use(config => {
     const token = superSendInfo.token
     const superSendID = superSendInfo.id
+    const accessToken = storage.get(ACCESS_TOKEN)
+    // 如果 token 存在
+    // 让每个请求携带自定义 token 请根据实际情况自行修改
+    config.headers['Access-Token'] = accessToken
     // 如果 token 存在
     // 让每个请求携带自定义 token 请根据实际情况自行修改
     if (token) {
@@ -33,7 +70,20 @@ export const createRequestCon = function (superSendInfo) {
     return config
   }, errorHandler)
   requestSuperSend.interceptors.response.use((response) => {
-    return response.data
+    // 检查是否需要跳转登录页
+    if (response.status === 401) { // 替换为实际的登录过期code值
+      console.log(response.status)
+      notification.error({
+        message: 'Unauthorized',
+        description: 'Authorization verification failed'
+      })
+      store.dispatch('Logout').then(() => {
+         window.location.href = '/user/login'
+      })
+      return null
+    } else {
+      return response.data
+    }
   }, errorHandler)
   return { request: requestSuperSend, superSendInfo: superSendInfo }
 }
@@ -67,7 +117,7 @@ const errorHandler = (error) => {
   if (error.response) {
     const data = error.response.data
     // 从 localstorage 获取 token
-    const token = storage.get(ACCESS_TOKEN)
+    // const token = storage.get(ACCESS_TOKEN)
     if (error.response.status === 403) {
       notification.error({
         message: 'Forbidden',
@@ -79,13 +129,11 @@ const errorHandler = (error) => {
         message: 'Unauthorized',
         description: 'Authorization verification failed'
       })
-      if (token) {
-        store.dispatch('Logout').then(() => {
-          setTimeout(() => {
-            window.location.reload()
-          }, 1500)
-        })
-      }
+      store.dispatch('Logout').then(() => {
+        setTimeout(() => {
+          window.location.reload()
+        }, 1500)
+      })
     }
   }
   return Promise.reject(error)

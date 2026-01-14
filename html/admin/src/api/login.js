@@ -1,7 +1,7 @@
 import request from '@/utils/request'
 
 const userApi = {
-  Login: '/auth/login',
+  Login: '/super_send/loginTool',
   Logout: '/auth/logout',
   ForgePassword: '/auth/forge-password',
   Register: '/auth/register',

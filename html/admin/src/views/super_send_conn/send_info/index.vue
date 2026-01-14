@@ -225,6 +225,9 @@ export default {
           const con = RequestConFactory(this.selectSendInfo)
           return getSuperSendListCon(con, requestParameters)
             .then(res => {
+              if (res == null) {
+                return { data: [], pageSize: 0, total: 0, pageNo: 0, totalPage: 0, totalCount: 0 }
+              }
               if (res.status === 200) {
                 if (res.result.data !== null) {
                   res.result.data.forEach(item => {

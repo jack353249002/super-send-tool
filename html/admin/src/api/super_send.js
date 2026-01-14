@@ -1,4 +1,4 @@
-import request, { createRequestCon } from '@/utils/request'
+import { createRequest, createRequestCon } from '@/utils/request'
 export const SUPERSENDCON = {}
 export const superSendApi = {
   GetSuperSendList: '/super_send/getSuperSendList',
@@ -58,47 +58,53 @@ export const superSendApi = {
   DelCheckAlive: '/check_alive/del'
 }
 export function getOnlineSuperSend () {
-  return request({
+  var con = createRequest()
+  return con.request({
     url: superSendApi.GetOnlineSuperSend,
     method: 'post',
     data: {}
   })
 }
 export function getSuperSendList (parameter) {
+  var con = createRequest()
   parameter.is_ssl = Number(parameter.is_ssl)
-  return request({
+  return con.request({
     url: superSendApi.GetSuperSendList,
     method: 'post',
     data: parameter
   })
 }
 export function addSuperSend (parameter) {
+  var con = createRequest()
   parameter.is_ssl = Number(parameter.is_ssl)
   parameter.refresh_token_interval = Number(parameter.refresh_token_interval)
-  return request({
+  return con.request({
     url: superSendApi.AddSuperSend,
     method: 'post',
     data: parameter
   })
 }
 export function updateSuperSend (parameter) {
+  var con = createRequest()
   parameter.is_ssl = Number(parameter.is_ssl)
   parameter.refresh_token_interval = Number(parameter.refresh_token_interval)
-  return request({
+  return con.request({
     url: superSendApi.UpdateSuperSend,
     method: 'post',
     data: parameter
   })
 }
 export function deleteSuperSend (id) {
-  return request({
+  var con = createRequest()
+  return con.request({
     url: superSendApi.DeleteSuperSend,
     method: 'post',
     data: { 'id': id }
   })
 }
 export function setSuperSendOnline (id, online) {
-  return request({
+  var con = createRequest()
+  return con.request({
     url: superSendApi.SetSuperSendOnline,
     method: 'post',
     data: { 'id': id, 'online': online }
@@ -139,7 +145,8 @@ export function getMessageList (con, parameter) {
   })
 }
 export function getSuperSendInfo (id) {
-  return request({
+  var con = createRequest()
+  return con.request({
     url: superSendApi.GetSuperSendInfo,
     method: 'post',
     data: {
@@ -464,21 +471,24 @@ export function setReceiveCon (con, parameter) {
   })
 }
 export function getCheckAliveList (parameter) {
-  return request({
+  var con = createRequest()
+  return con.request({
     url: superSendApi.GetCheckAliveList,
     method: 'post',
     data: parameter
   })
 }
 export function addCheckAlive (parameter) {
-  return request({
+  var con = createRequest()
+  return con.request({
     url: superSendApi.CreateCheckAlive,
     method: 'post',
     data: parameter
   })
 }
 export function setCheckAlive (parameter) {
-  return request({
+  var con = createRequest()
+  return con.request({
     url: superSendApi.SetCheckAlive,
     method: 'post',
     data: parameter
@@ -486,7 +496,8 @@ export function setCheckAlive (parameter) {
 }
 
 export function delCheckAlive (id) {
-  return request({
+  var con = createRequest()
+  return con.request({
     url: superSendApi.DelCheckAlive,
     method: 'post',
     data: { id: Number(id) }

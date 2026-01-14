@@ -166,6 +166,9 @@ export default {
           const con = RequestConFactory(this.selectSendInfo)
           return getMessageList(con, requestParameters)
             .then(res => {
+              if (res == null) {
+                return Promise.resolve({ data: [], total: 0 })
+              }
               if (res.status === 200) {
                 if (res.result.data !== null) {
                   return res.result
