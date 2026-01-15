@@ -59,6 +59,7 @@ export default {
           // }).catch(() => console.log('Oops errors!'))
           return this.$store.dispatch('Logout').then(() => {
             this.$router.push({ name: 'login' })
+            window.location.href = '/user/login'
           })
         },
         onCancel () {}
