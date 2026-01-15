@@ -118,10 +118,6 @@ const columns = [
     dataIndex: 'username'
   },
   {
-    title: '密码',
-    dataIndex: 'password'
-  },
-  {
     title: '操作',
     dataIndex: 'action',
     width: '150px',

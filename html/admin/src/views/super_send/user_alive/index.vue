@@ -120,6 +120,20 @@ const columns = [
     dataIndex: 'super_send_conn_info_address'
   },
   {
+    title: '位置坐标',
+    dataIndex: 'position'
+  },
+  {
+    title: '最后通信时间',
+    dataIndex: 'last_ping_time',
+    customRender: (text) => {
+      if (text === 0) {
+        return '无'
+      }
+      return dayjs(text * 1000).format('YYYY-MM-DD HH:mm:ss')
+    }
+  },
+  {
     title: '操作',
     dataIndex: 'action',
     width: '150px',
