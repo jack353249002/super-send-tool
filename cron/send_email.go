@@ -17,7 +17,7 @@ import (
 func SendEmailCron() {
 	for {
 		SendEmail()
-		time.Sleep(10 * time.Second)
+		time.Sleep(60 * time.Second)
 	}
 }
 func SendEmail() {

@@ -19,15 +19,17 @@ type CheckUserAlive struct {
 	Position               string `json:"position" gorm:"column:position"`
 }
 type CheckUserAliveJoinConnInfo struct {
-	ID                       int    `json:"id" gorm:"column:id"`
-	Username                 string `json:"username" gorm:"column:username"`
-	Password                 string `json:"password" gorm:"column:password"`
-	DayLoginFirstTime        int    `json:"day_login_first_time" gorm:"column:day_login_first_time"`
-	SendID                   int    `json:"send_id" gorm:"column:send_id"`
-	SendEmailActionTimeout   int    `json:"send_email_action_timeout" gorm:"column:send_email_action_timeout"`
-	Salt                     string `json:"salt" gorm:"column:salt"`
-	SuperSendConnInfoId      int    `json:"super_send_conn_info_id" gorm:"column:super_send_conn_info_id"`
-	SuperSendConnInfoAddress string `json:"super_send_conn_info_address" gorm:"column:super_send_conn_info_address"`
+	ID                       int    `json:"id" gorm:"column:id" :"id"`
+	Username                 string `json:"username" gorm:"column:username" :"username"`
+	Password                 string `json:"password" gorm:"column:password" :"password"`
+	DayLoginFirstTime        int    `json:"day_login_first_time" gorm:"column:day_login_first_time" :"day_login_first_time"`
+	SendID                   int    `json:"send_id" gorm:"column:send_id" :"send_id"`
+	SendEmailActionTimeout   int    `json:"send_email_action_timeout" gorm:"column:send_email_action_timeout" :"send_email_action_timeout"`
+	Salt                     string `json:"salt" gorm:"column:salt" :"salt"`
+	SuperSendConnInfoId      int    `json:"super_send_conn_info_id" gorm:"column:super_send_conn_info_id" :"super_send_conn_info_id"`
+	SuperSendConnInfoAddress string `json:"super_send_conn_info_address" gorm:"column:super_send_conn_info_address" :"super_send_conn_info_address"`
+	Position                 string `json:"position" gorm:"column:position" :"position"`
+	LastPingTime             int    `json:"last_ping_time" gorm:"column:last_ping_time"`
 }
 
 func (m *CheckUserAlive) TableName() string {
