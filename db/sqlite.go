@@ -28,8 +28,8 @@ func SqLiteSetup(dbPath string) {
 	}
 	Db, err = gorm.Open(sqlite.Open(dbPath), conf)
 	if isFirst {
-		sqlTable := ``
-		Db.Exec(sqlTable)
+		/*sqlTable := ``
+		Db.Exec(sqlTable)*/
 	}
 	if err != nil {
 		log.Fatalln(err)
