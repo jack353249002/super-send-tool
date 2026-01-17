@@ -32,7 +32,8 @@ func CreateCheckUserAlive(c *gin.Context) {
 			return
 		}
 		userRequest.Password = utils.MD5(userRequest.Password, salt)
-		err = dao.Create(c, &dbmodel.CheckUserAlive{Salt: salt, Username: userRequest.Username, Password: userRequest.Password, DayLoginFirstTime: userRequest.DayLoginFirstTime, SendID: userRequest.SendID, SendEmailActionTimeout: userRequest.SendEmailActionTimeout, SuperSendConnInfoId: int(userRequest.SuperSendConnInfoID)})
+		err = dao.Create(c, &dbmodel.CheckUserAlive{Salt: salt, Username: userRequest.Username, Password: userRequest.Password, DayLoginFirstTime: userRequest.DayLoginFirstTime, SendID: userRequest.SendID, SendEmailActionTimeout: userRequest.SendEmailActionTimeout,
+			SuperSendConnInfoId: int(userRequest.SuperSendConnInfoID), MessageID: userRequest.MessageID, SendEmailAccounts: userRequest.SendEmailAccounts, SmtpIds: userRequest.SmtpIds})
 		if err != nil {
 			ResponseFailed(c, nil, err.Error())
 			return
@@ -78,6 +79,9 @@ func SetCheckUserAlive(c *gin.Context) {
 		saveData["send_id"] = userRequest.SendID
 		saveData["send_email_action_timeout"] = userRequest.SendEmailActionTimeout
 		saveData["super_send_conn_info_id"] = userRequest.SuperSendConnInfoID
+		saveData["send_email_accounts"] = userRequest.SendEmailAccounts
+		saveData["message_id"] = userRequest.MessageID
+		saveData["smtp_ids"] = userRequest.SmtpIds
 		if userRequest.Password != "" {
 			saveData["password"] = utils.MD5(userRequest.Password, oldUser.Salt)
 		}
@@ -176,10 +180,10 @@ func CheckUserAlivePing(c *gin.Context) {
 			ResponseFailed(c, nil, "密码错误")
 			return
 		} else {
-			nowTime := time.Now()
-			nowDayBegin := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 0, 0, 0, 0, nowTime.Location())
+			nowTime := time.Now().UTC()
+			nowDayBegin := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 0, 0, 0, 0, time.UTC)
 			oldUserTime := time.Unix(int64(user.DayLoginFirstTime), 0)
-			oldUserTimeBegin := time.Date(oldUserTime.Year(), oldUserTime.Month(), oldUserTime.Day(), 0, 0, 0, 0, oldUserTime.Location())
+			oldUserTimeBegin := time.Date(oldUserTime.Year(), oldUserTime.Month(), oldUserTime.Day(), 0, 0, 0, 0, time.UTC)
 			if nowDayBegin.Unix() == oldUserTimeBegin.Unix() {
 				dao.Update(c, "id=@id", map[string]interface{}{"position": request.Position, "last_ping_time": nowTime.Unix()}, map[string]interface{}{"id": user.ID})
 				ResponseSuccess(c, nil, "success")

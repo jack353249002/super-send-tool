@@ -35,7 +35,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type SendServiceClient interface {
 	// 设置发送规则
-	SetSend(ctx context.Context, in *AddSendRequest, opts ...grpc.CallOption) (*SendResponse, error)
+	SetSend(ctx context.Context, in *AddSendRequest, opts ...grpc.CallOption) (*AddSendResponse, error)
 	// 重置发送器(一般用于一个发送器已经处理完成后，所有内部运行状态恢复为未启用状态)
 	ResetSend(ctx context.Context, in *EditSendRequest, opts ...grpc.CallOption) (*SendResponse, error)
 	// 获取发送规则详情
@@ -60,8 +60,8 @@ func NewSendServiceClient(cc grpc.ClientConnInterface) SendServiceClient {
 	return &sendServiceClient{cc}
 }
 
-func (c *sendServiceClient) SetSend(ctx context.Context, in *AddSendRequest, opts ...grpc.CallOption) (*SendResponse, error) {
-	out := new(SendResponse)
+func (c *sendServiceClient) SetSend(ctx context.Context, in *AddSendRequest, opts ...grpc.CallOption) (*AddSendResponse, error) {
+	out := new(AddSendResponse)
 	err := c.cc.Invoke(ctx, SendService_SetSend_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
@@ -137,7 +137,7 @@ func (c *sendServiceClient) GetSmtpServerList(ctx context.Context, in *empty.Emp
 // for forward compatibility
 type SendServiceServer interface {
 	// 设置发送规则
-	SetSend(context.Context, *AddSendRequest) (*SendResponse, error)
+	SetSend(context.Context, *AddSendRequest) (*AddSendResponse, error)
 	// 重置发送器(一般用于一个发送器已经处理完成后，所有内部运行状态恢复为未启用状态)
 	ResetSend(context.Context, *EditSendRequest) (*SendResponse, error)
 	// 获取发送规则详情
@@ -159,7 +159,7 @@ type SendServiceServer interface {
 type UnimplementedSendServiceServer struct {
 }
 
-func (UnimplementedSendServiceServer) SetSend(context.Context, *AddSendRequest) (*SendResponse, error) {
+func (UnimplementedSendServiceServer) SetSend(context.Context, *AddSendRequest) (*AddSendResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method SetSend not implemented")
 }
 func (UnimplementedSendServiceServer) ResetSend(context.Context, *EditSendRequest) (*SendResponse, error) {

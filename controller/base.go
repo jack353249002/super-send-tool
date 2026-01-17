@@ -55,7 +55,7 @@ func (r *ReloadSignalModel) Reload() {
 		defer func() {
 			oldToken := r.Token
 			r.IsEnd = true
-			r.EndTime = time.Now().Unix()
+			r.EndTime = time.Now().UTC().Unix()
 			time.Sleep(time.Second * 10)
 			if r.Token == oldToken && r.Token != "" {
 				r.End()

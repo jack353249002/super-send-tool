@@ -13,6 +13,7 @@ message MessageRequest{
 message MessageResponse{
     uint32 code=1; //状态码 0=失败,1=成功
     string message=2;//信息
+    int64  id=3;
 }
 //消息列表请求
 message MessageListRequest{
@@ -24,12 +25,12 @@ message MessageListRequest{
 }
 //消息信息
 message MessageList{
-   int64  id=5;    //主键
-   string title=1;  //标题
-   string body=2;   //详情
-   string attach=3;  //附件
-   int64 createtime=4;  //创建时间
-   string content_type=6; //内容类型
+    int64  id=5;    //主键
+    string title=1;  //标题
+    string body=2;   //详情
+    string attach=3;  //附件
+    int64 createtime=4;  //创建时间
+    string content_type=6; //内容类型
 }
 //消息列表响应
 message MessageListResponse{

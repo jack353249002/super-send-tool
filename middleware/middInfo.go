@@ -94,7 +94,7 @@ func MiddInfo() gin.HandlerFunc {
 				c.Abort()
 				return
 			} else if superSendInfo.RefreshTokenInterval != 0 {
-				nowTime := time.Now().Unix()
+				nowTime := time.Now().UTC().Unix()
 				if nowTime-int64(superSendInfo.ConnLastLoginTime) > int64(superSendInfo.RefreshTokenInterval) {
 					con := grpccons.SuperSendGroupAction.Get(superSendIDInt)
 					if con == nil {

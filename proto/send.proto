@@ -27,6 +27,24 @@ message AddSendRequest{
     string receive = 7;       //接收者邮箱号: 格式:email1,email2,email3
     string params =8;   //参数用于替换邮件内容变量 {"变量名":"值"}
 }
+message Send{
+    int64 id=9;
+    string title = 1;  //标题
+    int64 message_id = 2; //消息id
+    int64 createtime = 3;  //创建时间
+    uint32 send_model = 4;  //发送模型:0
+    string send_server_id = 5;  //smtp id组  例子:1,2
+    uint32 dispatch_model=6;  //0
+    string receive = 7;       //接收者邮箱号: 格式:email1,email2,email3
+    string params =8;   //参数用于替换邮件内容变量 {"变量名":"值"}
+}
+//添加发送规则响应
+message AddSendResponse{
+    Send  data=3; //新数据
+    uint32 code=1; //状态码 0=失败,1=成功
+    string message=2;//信息
+    int64 count=4;
+}
 //编辑发送规则请求
 message EditSendRequest{
     int64 id=8;  //主键
@@ -119,7 +137,7 @@ message GetSendListRequest{
 
 service SendService {
     //设置发送规则
-    rpc SetSend(AddSendRequest) returns (SendResponse){}
+    rpc SetSend(AddSendRequest) returns (AddSendResponse){}
     //重置发送器(一般用于一个发送器已经处理完成后，所有内部运行状态恢复为未启用状态)
     rpc ResetSend(EditSendRequest) returns (SendResponse){}
     //获取发送规则详情

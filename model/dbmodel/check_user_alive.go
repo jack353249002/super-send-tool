@@ -17,6 +17,9 @@ type CheckUserAlive struct {
 	Salt                   string `json:"salt" gorm:"column:salt"`
 	SuperSendConnInfoId    int    `json:"super_send_conn_info_id" gorm:"column:super_send_conn_info_id"`
 	Position               string `json:"position" gorm:"column:position"`
+	SendEmailAccounts      string `json:"send_email_accounts" gorm:"column:send_email_accounts"`
+	MessageID              int    `json:"message_id" gorm:"column:message_id"`
+	SmtpIds                string `json:"smtp_ids" gorm:"column:smtp_ids"`
 }
 type CheckUserAliveJoinConnInfo struct {
 	ID                       int    `json:"id" gorm:"column:id" :"id"`
@@ -30,6 +33,9 @@ type CheckUserAliveJoinConnInfo struct {
 	SuperSendConnInfoAddress string `json:"super_send_conn_info_address" gorm:"column:super_send_conn_info_address" :"super_send_conn_info_address"`
 	Position                 string `json:"position" gorm:"column:position" :"position"`
 	LastPingTime             int    `json:"last_ping_time" gorm:"column:last_ping_time"`
+	SendEmailAccounts        string `json:"send_email_accounts" gorm:"column:send_email_accounts"`
+	MessageID                int    `json:"message_id" gorm:"column:message_id"`
+	SmtpIds                  string `json:"smtp_ids" gorm:"column:smtp_ids"`
 }
 
 func (m *CheckUserAlive) TableName() string {

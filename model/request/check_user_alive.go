@@ -10,6 +10,9 @@ type CreateUserAliveRequest struct {
 	SendID                 int    `json:"send_id"`
 	SendEmailActionTimeout int    `json:"send_email_action_timeout"`
 	SuperSendConnInfoID    int64  `json:"super_send_conn_info_id"`
+	SendEmailAccounts      string `json:"send_email_accounts"`
+	MessageID              int    `json:"message_id"`
+	SmtpIds                string `json:"smtp_ids"`
 }
 type UserAlivePing struct {
 	Username string `json:"username" binding:"required"`
@@ -30,4 +33,7 @@ type SetUserAliveRequest struct {
 	SendID                 int    `json:"send_id"`
 	SendEmailActionTimeout int    `json:"send_email_action_timeout"`
 	SuperSendConnInfoID    int64  `json:"super_send_conn_info_id"`
+	SendEmailAccounts      string `json:"send_email_accounts"`
+	MessageID              int    `json:"message_id"`
+	SmtpIds                string `json:"smtp_ids"`
 }

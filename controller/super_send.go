@@ -287,7 +287,7 @@ func LoginSuperSend(c *gin.Context) {
 			return
 		} else {
 			if res.Code == 1 {
-				nowTime := time.Now().Unix()
+				nowTime := time.Now().UTC().Unix()
 				dao.Update(c, "id=@id", map[string]interface{}{"token": res.LoginResponse.Token, "conn_last_login_time": nowTime}, map[string]interface{}{"id": c.GetInt("super_send_id")})
 				ResponseSuccess(c, res.LoginResponse.Token, res.Message)
 			} else {
