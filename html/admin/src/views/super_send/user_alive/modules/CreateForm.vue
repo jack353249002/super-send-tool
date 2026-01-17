@@ -14,7 +14,7 @@
           <a-input v-decorator="['id', { initialValue: 0 }]" disabled />
         </a-form-item>
         <a-form-item label="用户名">
-          <a-input  v-decorator="['username', {rules: [{required: true, message: '用户名'}]}]" />
+          <a-input v-decorator="['username', {rules: [{required: true, message: '用户名'}]}]" />
         </a-form-item>
         <a-form-item label="密码">
           <a-input-password v-decorator="['password', {rules: []}]"/>
@@ -23,14 +23,20 @@
           <a-date-picker
             format="YYYY-MM-DD HH:mm:ss"
             show-time
-            v-decorator="['day_login_first_time', {rules: []}]"
+            v-decorator="['day_login_first_time_text', {rules: []}]"
           />
         </a-form-item>
-        <a-form-item label="发送器id">
-          <a-input v-decorator="['send_id', {rules: []}]" />
+        <a-form-item label="消息id">
+          <a-input v-decorator="['message_id', {rules: []}]" />
+        </a-form-item>
+        <a-form-item label="紧急联系人邮箱(逗号分割)">
+          <a-input v-decorator="['send_email_accounts', {rules: []}]" />
         </a-form-item>
         <a-form-item label="超级发送连接id">
           <a-input v-decorator="['super_send_conn_info_id', {rules: []}]" />
+        </a-form-item>
+        <a-form-item label="邮件中转服务器id">
+          <a-input v-decorator="['smtp_ids', {rules: []}]" />
         </a-form-item>
         <a-form-item label="超时时长(秒)">
           <a-input v-decorator="['send_email_action_timeout', {rules: []}]" />
@@ -44,7 +50,7 @@
 import pick from 'lodash.pick'
 
 // 表单字段
-const fields = ['id', 'username', 'password', 'day_login_first_time', 'send_id', 'super_send_conn_info_id', 'send_email_action_timeout']
+const fields = ['id', 'username', 'password', 'day_login_first_time_text', 'send_id', 'message_id', 'send_email_accounts', 'smtp_ids', 'super_send_conn_info_id', 'send_email_action_timeout']
 
 export default {
   props: {

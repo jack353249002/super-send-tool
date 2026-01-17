@@ -140,10 +140,10 @@ const columns = [
     title: '发送成功数量',
     dataIndex: 'success_count'
   },
-  {
+  /* {
     title: '参数',
     dataIndex: 'params'
-  },
+  }, */
   {
     title: '状态',
     dataIndex: 'status',

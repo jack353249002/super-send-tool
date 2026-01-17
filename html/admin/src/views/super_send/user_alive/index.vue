@@ -99,17 +99,14 @@ const columns = [
   },
   {
     title: '签到时间',
-    dataIndex: 'day_login_first_time',
+    dataIndex: 'day_login_first_time_text',
     customRender: (text) => {
-      if (text === 0) {
-        return '无'
-      }
-      return dayjs(text * 1000).format('YYYY-MM-DD HH:mm:ss')
+      return text
     }
   },
   {
-    title: '发送器id',
-    dataIndex: 'send_id'
+    title: '消息id',
+    dataIndex: 'message_id'
   },
   {
     title: '距离签到时间超时时长(秒)',
@@ -118,10 +115,6 @@ const columns = [
   {
     title: '连接器地址',
     dataIndex: 'super_send_conn_info_address'
-  },
-  {
-    title: '位置坐标',
-    dataIndex: 'position'
   },
   {
     title: '最后通信时间',
@@ -176,6 +169,13 @@ export default {
         return getCheckAliveList(requestParameters)
           .then(res => {
             if (res != null) {
+              for (let i = 0; i < res.result.data.length; i++) {
+                if (res.result.data[i].day_login_first_time === 0) {
+                  res.result.data[i].day_login_first_time_text = ''
+                } else {
+                  res.result.data[i].day_login_first_time_text = dayjs(res.result.data[i].day_login_first_time * 1000).format('YYYY-MM-DD HH:mm:ss')
+                }
+              }
               return res.result
             } else {
               return { data: [], pageSize: 0, total: 0, pageNo: 0, totalPage: 0, totalCount: 0 }
@@ -267,9 +267,10 @@ export default {
           values.super_send_conn_info_id = parseInt(values.super_send_conn_info_id)
           values.send_email_action_timeout = parseInt(values.send_email_action_timeout)
           values.id = parseInt(values.id)
+          values.message_id = parseInt(values.message_id)
           console.log('values', values)
           // 创建 Date 对象
-          const date = new Date(values.day_login_first_time)
+          const date = new Date(values.day_login_first_time_text)
           // 获取毫秒级时间戳，然后除以1000转为秒级，并转为整数
           values.day_login_first_time = Math.floor(date.getTime() / 1000)
           if (values.id > 0) {
