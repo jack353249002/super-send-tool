@@ -164,6 +164,10 @@ export default {
             } else {
               return { data: [], pageSize: 0, total: 0, pageNo: 0, totalPage: 0, totalCount: 0 }
             }
+          }).catch(error => {
+            console.log(error)
+            this.$message.error('网络错误')
+            return { data: [], pageSize: 0, total: 0, pageNo: 0, totalPage: 0, totalCount: 0 }
           })
       },
       selectedRowKeys: [],
@@ -200,6 +204,9 @@ export default {
           } else {
             this.$message.error(res.message)
           }
+      }).catch(error => {
+        console.log(error)
+        this.$message.error('网络错误')
       })
     },
     handleOnline (id, online) {
@@ -212,6 +219,9 @@ export default {
               } else {
                 this.$message.error(res.message)
               }
+            }).catch(error => {
+              console.log(error)
+              this.$message.error('网络错误')
             })
           }
           this.$refs.table.refresh()
@@ -220,6 +230,10 @@ export default {
         } else {
           this.$message.error(res.message)
         }
+      }).catch(error => {
+        console.log(error)
+        this.$message.error('网络错误')
+        this.confirmLoading = false
       })
     },
     handleAdd () {
@@ -239,6 +253,9 @@ export default {
         } else {
           this.$message.error(res.message)
         }
+      }).catch(error => {
+        console.log(error)
+        this.$message.error('网络错误')
       })
     },
     handleOk () {
@@ -262,6 +279,10 @@ export default {
               } else {
                 this.$message.error(res.message)
               }
+            }).catch(error => {
+              console.log(error)
+              this.$message.error('网络错误')
+              this.confirmLoading = false
             })
           } else {
             // 新增
@@ -278,7 +299,11 @@ export default {
                } else {
                  this.$message.error(res.message)
                }
-            })
+            }).catch(error => {
+               console.log(error)
+               this.$message.error('网络错误')
+               this.confirmLoading = false
+             })
           }
         } else {
           this.confirmLoading = false

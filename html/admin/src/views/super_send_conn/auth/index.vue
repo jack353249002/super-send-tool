@@ -165,6 +165,9 @@ export default {
                 this.$message.error(res.message)
                 return Promise.resolve({ data: [], total: 0 })
               }
+            }).catch(error => {
+              console.log(error)
+              this.$message.error('网络错误')
             })
         } else {
           return Promise.resolve({ data: [], total: 0 })
@@ -233,6 +236,9 @@ export default {
         } else {
           this.$message.error(res.message)
         }
+      }).catch(error => {
+        console.log(error)
+        this.$message.error('网络错误')
       })
     },
     handelSetUserPassword (record) {
@@ -269,6 +275,9 @@ export default {
           } else {
             this.$message.error(res.message)
           }
+        }).catch(error => {
+          console.log(error)
+          this.$message.error('网络错误')
         })
       }
     },
@@ -294,6 +303,10 @@ export default {
               } else {
                 this.$message.error(res.message)
               }
+            }).catch(error => {
+              console.log(error)
+              this.$message.error('网络错误')
+              this.confirmLoading = false
             })
           }
         } else {
@@ -333,6 +346,10 @@ export default {
               } else {
                 this.$message.error(res.message)
               }
+            }).catch(error => {
+              console.log(error)
+              this.$message.error('网络错误')
+              this.confirmLoadingUserPassword = false
             })
           }
         } else {
