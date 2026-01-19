@@ -119,13 +119,10 @@ func SuperSendRouter(r *gin.Engine) {
 	}
 	// 最后处理前端路由
 	r.NoRoute(func(c *gin.Context) {
-		// 对于 API 路径，返回 404 或错误信息
-		if strings.HasPrefix(c.Request.URL.Path, "/super_send/") ||
-			strings.HasPrefix(c.Request.URL.Path, "/etcd_bridge/") {
-			//c.JSON(404, gin.H{"error": "API endpoint not found"})
+		if strings.HasPrefix(c.Request.URL.Path, "/html/") {
 			// 其他路径返回前端 index.html
 			c.File("run_root/index.html")
-			return
 		}
+		return
 	})
 }
