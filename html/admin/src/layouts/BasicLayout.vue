@@ -208,56 +208,56 @@ export default {
             for (let i = 0; i < lists.length; i++) {
               const id = lists[i].id // 假设 lists[i]
               routes.children.push({
-                path: `/super_send_conn${id}`,
+                path: `/html/super_send_conn${id}`,
                 name: `super_send_conn_${id}`,
                 component: RouteView,
-                redirect: '/super_send_conn/message',
+                redirect: '/html/super_send_conn/message',
                 meta: { title: lists[i].title, icon: 'table', permission: [] },
                 children: [
                   {
-                    path: `/super_send_conn${id}/message?id=${id}`,
+                    path: `/html/super_send_conn${id}/message?id=${id}`,
                     name: `super_send_conn_${id}_message`,
                     component: () => import(`@/views/super_send_conn/message`),
                     meta: { title: '消息管理', forceReload: true, keepAlive: false, permission: [] }
                   },
                   {
-                    path: `/super_send_conn${id}/send_info?id=${id}`,
+                    path: `/html/super_send_conn${id}/send_info?id=${id}`,
                     name: `super_send_conn_${id}_send_info`,
                     component: () => import(`@/views/super_send_conn/send_info`),
                     meta: { title: '发送配置管理', keepAlive: false, permission: [] }
                   },
                   {
-                    path: `/super_send_conn${id}/smtp?id=${id}`,
+                    path: `/html/super_send_conn${id}/smtp?id=${id}`,
                     name: `super_send_conn_${id}_smtp`,
                     component: () => import(`@/views/super_send_conn/smtp`),
                     meta: { title: 'smtp服务器', keepAlive: false, permission: [] }
                   },
                   {
-                    path: `/super_send_conn${id}/conf?id=${id}`,
+                    path: `/html/super_send_conn${id}/conf?id=${id}`,
                     name: `super_send_conn_${id}_conf`,
                     component: () => import(`@/views/super_send_conn/conf`),
                     meta: { title: '配置文件管理', keepAlive: false, permission: [] }
                   },
                   {
-                    path: `/super_send_conn${id}/imap?id=${id}`,
+                    path: `/html/super_send_conn${id}/imap?id=${id}`,
                     name: `super_send_conn_${id}imap`,
                     component: () => import(`@/views/super_send_conn/imap`),
                     meta: { title: 'imap服务器', keepAlive: false, permission: [] }
                   },
                   {
-                    path: `/super_send_conn${id}/receive?id=${id}`,
+                    path: `/html/super_send_conn${id}/receive?id=${id}`,
                     name: `super_send_conn_${id}_receive`,
                     component: () => import(`@/views/super_send_conn/receive`),
                     meta: { title: '接收配置管理', keepAlive: false, permission: [] }
                   },
                   {
-                    path: `/super_send_conn${id}/server_user?id=${id}`,
+                    path: `/html/super_send_conn${id}/server_user?id=${id}`,
                     name: `super_send_conn_${id}_server_user`,
                     component: () => import(`@/views/super_send_conn/server_user`),
                     meta: { title: '服务用户管理', keepAlive: false, permission: [] }
                   },
                   {
-                    path: `/super_send_conn${id}/auth?id=${id}`,
+                    path: `/html/super_send_conn${id}/auth?id=${id}`,
                     name: `super_send_conn_${id}_auth`,
                     component: () => import(`@/views/super_send_conn/auth`),
                     meta: { title: '权限管理', keepAlive: false, permission: [] }

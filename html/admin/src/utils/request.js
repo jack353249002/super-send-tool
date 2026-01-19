@@ -35,7 +35,7 @@ export const createRequest = function () {
         description: 'Authorization verification failed'
       })
       store.dispatch('Logout').then(() => {
-          window.location.href = '/user/login'
+          window.location.href = '/html/user/login'
       })
       return null
     } else {
@@ -78,7 +78,7 @@ export const createRequestCon = function (superSendInfo) {
         description: 'Authorization verification failed'
       })
       store.dispatch('Logout').then(() => {
-         window.location.href = '/user/login'
+         window.location.href = '/html/user/login'
       })
       return null
     } else {
