@@ -184,6 +184,7 @@ func CheckUserAlivePing(c *gin.Context) {
 			loc, err := time.LoadLocation(request.TimeZone)
 			if err != nil {
 				fmt.Println("时区加载失败:", err)
+				ResponseFailed(c, nil, "时区加载失败")
 				return
 			}
 			nowTime := time.Now().In(loc)
