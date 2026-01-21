@@ -18,6 +18,7 @@ type UserAlivePing struct {
 	Username string `json:"username" binding:"required"`
 	Password string `json:"password" binding:"required"`
 	Position string `json:"position"`
+	TimeZone string `json:"time_zone" binding:"required"` //时区
 }
 type DelUserAliveRequest struct {
 	ID int64 `json:"id" binding:"required"`

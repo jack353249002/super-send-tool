@@ -1,6 +1,7 @@
 package controller
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"gorm.io/gorm"
 	"super-send-tool/db"
@@ -180,10 +181,15 @@ func CheckUserAlivePing(c *gin.Context) {
 			ResponseFailed(c, nil, "密码错误")
 			return
 		} else {
-			nowTime := time.Now().UTC()
-			nowDayBegin := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 0, 0, 0, 0, time.UTC)
+			loc, err := time.LoadLocation(request.TimeZone)
+			if err != nil {
+				fmt.Println("时区加载失败:", err)
+				return
+			}
+			nowTime := time.Now().In(loc)
+			nowDayBegin := time.Date(nowTime.Year(), nowTime.Month(), nowTime.Day(), 0, 0, 0, 0, loc)
 			oldUserTime := time.Unix(int64(user.DayLoginFirstTime), 0)
-			oldUserTimeBegin := time.Date(oldUserTime.Year(), oldUserTime.Month(), oldUserTime.Day(), 0, 0, 0, 0, time.UTC)
+			oldUserTimeBegin := time.Date(oldUserTime.Year(), oldUserTime.Month(), oldUserTime.Day(), 0, 0, 0, 0, loc)
 			if nowDayBegin.Unix() == oldUserTimeBegin.Unix() {
 				dao.Update(c, "id=@id", map[string]interface{}{"position": request.Position, "last_ping_time": nowTime.Unix()}, map[string]interface{}{"id": user.ID})
 				ResponseSuccess(c, nil, "success")

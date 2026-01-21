@@ -55,7 +55,13 @@ func SuperSendErrorMessages(err error) map[string]string {
 				if fieldErr.Tag() == "required" {
 					errors["send_server_id"] = "发送服务器id不能为空"
 				}
+			case "TimeZone":
+				if fieldErr.Tag() == "required" {
+					errors["time_zone"] = "时区不能为空"
+				}
+
 			}
+
 		}
 	}
 	return errors
